@@ -36,7 +36,6 @@ defmodule Membrane.Element.Mad.Decoder do
 
   # first call
   defp decode_buffer(native, buffer) do
-    IO.write :stderr, "first\n\n\n\n"
     decode_buffer(native, buffer, <<>>, 0)
   end
 
@@ -56,11 +55,6 @@ defmodule Membrane.Element.Mad.Decoder do
         decode_buffer(native, rest, acc <> decoded_frame, bytes_used + frame_size)
 
       :buflen_error ->
-        IO.write :stderr, "buflen \n\n\n"
-        {acc, bytes_used}
-
-      {:recoverable_error, desc} ->
-        IO.write :stderr, "recoverable \n\n\n"
         {acc, bytes_used}
 
       {:error, desc} ->

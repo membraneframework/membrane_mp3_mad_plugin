@@ -65,15 +65,6 @@ unsigned short fixed_to_s16le(mad_fixed_t sample) {
 }
 
 
-static ERL_NIF_TERM create_mad_error(ErlNifEnv* env, const char* description, int recoverable) {
-  ERL_NIF_TERM tuple[2] = {
-    enif_make_atom(env, recoverable ? "recoverable_error" : "error"),
-    enif_make_string(env, description, ERL_NIF_LATIN1) 
-  };
-
-  return enif_make_tuple_from_array(env, tuple, 2);
-}
-
 /*
  * Decodes one frame from input
  * 
@@ -85,7 +76,6 @@ static ERL_NIF_TERM create_mad_error(ErlNifEnv* env, const char* description, in
  * - tuple {:ok, {decoded_audio, bytes_used}}
  *    decoded_audio is a bitstring with interleaved channels
  * - :buflen_error - when input buffer is too small
- * - {:recoverable_error, description}
  * - {:error, description}
  */
 static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
@@ -113,19 +103,26 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
   mad_stream_buffer(mad_stream, buffer.data, buffer.size);
   mad_stream->error=0;
 
-  if(mad_frame_decode(mad_frame, mad_stream)) {
+
+  while(mad_frame_decode(mad_frame, mad_stream)) {
+    const char *description = mad_stream_errorstr(mad_stream);
+
     // no enough buffer to decode next frame
     if(mad_stream->error == MAD_ERROR_BUFLEN) {    
       return enif_make_atom(env, "buflen_error");
     }
-    else {
-      char const *description = mad_stream_errorstr(mad_stream);
-      mad_stream->error = 0;
-      return create_mad_error(env, description, MAD_RECOVERABLE(mad_stream->error));
+    
+    if(!MAD_RECOVERABLE(mad_stream->error)) {
+       return membrane_util_make_error(env, enif_make_string(env, description, ERL_NIF_LATIN1));
     }
+    
+    //error is recoverable - skip fragment and attempt to decode again
+    mad_stream->error = 0;
   }
 
+
   mad_synth_frame(mad_synth, mad_frame);
+  
   if(!mad_stream->next_frame){
     bytes_used = buffer.size;
   }
@@ -133,12 +130,14 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
     bytes_used = mad_stream->next_frame - mad_stream->buffer;  
   }
   
+
   int channels = MAD_NCHANNELS(&(mad_frame->header));
   size_t decoded_frame_size = channels * mad_synth->pcm.length * sizeof(short);
   
   ERL_NIF_TERM binary_term, output_term;
   unsigned char *data_ptr;
   data_ptr = enif_make_new_binary(env, decoded_frame_size, &binary_term);
+
 
   for (int i=0; i<mad_synth->pcm.length; i++) {
     short pcm = fixed_to_s16le(mad_synth->pcm.samples[0][i]);

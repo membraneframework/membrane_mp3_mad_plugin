@@ -12,7 +12,7 @@ defmodule Membrane.Element.Mad.DecoderNative do
 
 
   @spec decode_frame(any, bitstring) ::
-  {:ok, {bitstring, non_neg_integer}} | {:error, String} | {:recoverable_error, String} 
+  {:ok, {bitstring, non_neg_integer}} | :buflen_error | {:error, String} | {:recoverable_error, non_neg_integer, String} 
   def decode_frame(_native, _data), do: raise "NIF fail"
 
 end
