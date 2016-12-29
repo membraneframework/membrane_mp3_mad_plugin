@@ -31,7 +31,8 @@ defmodule Membrane.Element.Mad.Mixfile do
   defp deps do
     [
       {:membrane_core, git: "git@bitbucket.org:radiokit/membrane-core.git"},
-      {:membrane_caps_audio_mpeg, path: "../membrane-caps-audio-mpeg"},
+      {:membrane_caps_audio_mpeg, git: "git@bitbucket.org:radiokit/membrane-caps-audio-mpeg.git"},
+      {:membrane_caps_audio_raw, git: "git@bitbucket.org:radiokit/membrane-caps-audio-raw.git"},
       {:membrane_common_c, git: "git@bitbucket.org:radiokit/membrane-common-c.git"},
     ]
   end

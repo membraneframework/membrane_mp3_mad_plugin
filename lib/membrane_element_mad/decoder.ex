@@ -26,17 +26,18 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
 
-  def handle_buffer(caps, data, %{native: native, queue: queue} = state) do
+  def handle_buffer(%{channels: channels}, data, %{native: native, queue: queue} = state) do
     to_decode = queue <> data
     {decoded_audio, bytes_used} = decode_buffer(native, to_decode)
     << _used :: binary-size(bytes_used), rest :: binary >> = to_decode
-    {:send_buffer, {caps, decoded_audio}, %{state | queue: rest}}
+    new_caps = %Membrane.Caps.Audio.Raw{format: :s16le, sample_rate: 41000, channels: channels}
+    {:send_buffer, {new_caps, decoded_audio}, %{state | queue: rest}}
   end
 
 
   # first call
   defp decode_buffer(native, buffer) do
-    decode_buffer(native, buffer, <<>>, 0)
+    decode_buffer(native, buffer, << >>, 0)
   end
 
 
