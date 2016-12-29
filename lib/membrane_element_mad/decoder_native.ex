@@ -11,8 +11,8 @@ defmodule Membrane.Element.Mad.DecoderNative do
   def create(), do: raise "NIF fail"
 
 
-  @spec decode_buffer(any, bitstring) ::
-  {:ok, any}    
-  def decode_buffer(_native, _data), do: raise "NIF fail"
+  @spec decode_frame(any, bitstring) ::
+  {:ok, {bitstring, non_neg_integer}} | {:error, String} | {:recoverable_error, String} 
+  def decode_frame(_native, _data), do: raise "NIF fail"
 
 end
