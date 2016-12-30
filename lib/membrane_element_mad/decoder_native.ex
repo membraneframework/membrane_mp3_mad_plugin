@@ -16,6 +16,6 @@ defmodule Membrane.Element.Mad.DecoderNative do
   def decode_frame(_native, _data), do: raise "NIF fail"
 
   @spec get_stream_info(any) ::
-  {:ok, {non_neg_integer, non_neg_integer}}
+  {:ok, {non_neg_integer, non_neg_integer}} | {:error, any}
   def get_stream_info(_native), do: raise "NIF fail"
 end

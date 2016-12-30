@@ -21,7 +21,7 @@ int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
 
 
 /**
- * Initializes mad_stream, mad_frame, mad_synth and returns decoder_handle resource,
+ * Initializes mad_stream, mad_frame, mad_synth and returns DecoderHandle resource,
  */
 static ERL_NIF_TERM export_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
   DecoderHandle *handle = enif_alloc_resource(RES_DECODER_HANDLE_TYPE, sizeof(DecoderHandle));
@@ -57,7 +57,7 @@ unsigned short fixed_to_s16le(mad_fixed_t sample) {
   unsigned short be = sample >> (MAD_F_FRACBITS + 1 - 16);
   
   /* convert be to le */
-  unsigned short le = be & 0xff << 8;
+  unsigned short le = be & 0xff;
   le <<= 8;
   le += (be >> 8);
   
@@ -97,7 +97,7 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
   mad_frame = handle->mad_frame;
 
   if(!enif_inspect_binary(env, argv[1], &buffer)) {
-        return membrane_util_make_error_args(env, "buffer", "Passed buffer is not valid binary");
+    return membrane_util_make_error_args(env, "buffer", "Passed buffer is not valid binary");
   }
 
   mad_stream_buffer(mad_stream, buffer.data, buffer.size);
