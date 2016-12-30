@@ -15,4 +15,7 @@ defmodule Membrane.Element.Mad.DecoderNative do
   {:ok, {bitstring, non_neg_integer}} | :buflen_error | {:error, String.t}
   def decode_frame(_native, _data), do: raise "NIF fail"
 
+  @spec get_stream_info(any) ::
+  {:ok, {non_neg_integer, non_neg_integer}}
+  def get_stream_info(_native), do: raise "NIF fail"
 end

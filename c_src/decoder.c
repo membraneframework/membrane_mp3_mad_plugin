@@ -162,10 +162,37 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
 }
 
 
+/*
+ * Extracts sample_rate and number of channels from the last decoded frame
+ *
+ * Expexcts 1 argument - resource with DecoderHandle
+ * Returns {:ok, {samplerate, channels}}
+ */ 
+static ERL_NIF_TERM export_get_stream_info(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+  DecoderHandle *handle;
+
+  if(!enif_get_resource(env, argv[0], RES_DECODER_HANDLE_TYPE, (void **) &handle)) {
+    return membrane_util_make_error_args(env, "native", "Passed native decoder is not a valid resource");
+  }
+
+  struct mad_synth *synth = handle->mad_synth;
+
+  ERL_NIF_TERM out_arr[2] = {
+    enif_make_int(env, synth->pcm.samplerate),
+    enif_make_long(env, synth->pcm.channels)
+  };
+
+  ERL_NIF_TERM output_term;
+  output_term = enif_make_tuple_from_array(env, out_arr, 2);
+
+  return membrane_util_make_ok_tuple(env, output_term);
+}
+
 static ErlNifFunc nif_funcs[] =
 {
   {"create", 0, export_create},
-  {"decode_frame", 2, export_decode_frame}
+  {"decode_frame", 2, export_decode_frame},
+  {"get_stream_info", 1, export_get_stream_info}
 };
 
 ERL_NIF_INIT(Elixir.Membrane.Element.Mad.DecoderNative, nif_funcs, load, NULL, NULL, NULL)

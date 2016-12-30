@@ -1,13 +1,7 @@
-defmodule Membrane.Element.Mad.DecoderOptions do
-  defstruct \
-    sample_rate: 48000
-end
-
 
 defmodule Membrane.Element.Mad.Decoder do
   use Membrane.Element.Base.Filter
   alias Membrane.Element.Mad.DecoderNative
-  alias Membrane.Element.Mad.DecoderOptions
 
   @doc false
   def handle_prepare(_state) do
@@ -26,11 +20,15 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
 
-  def handle_buffer(%{channels: channels}, data, %{native: native, queue: queue} = state) do
+  def handle_buffer(_caps, data, %{native: native, queue: queue} = state) do
     to_decode = queue <> data
     {decoded_audio, bytes_used} = decode_buffer(native, to_decode)
+    
     << _used :: binary-size(bytes_used), rest :: binary >> = to_decode
-    new_caps = %Membrane.Caps.Audio.Raw{format: :s16le, sample_rate: 41000, channels: channels}
+    
+    {:ok, {sample_rate, channels}} = DecoderNative.get_stream_info(native) 
+    new_caps = %Membrane.Caps.Audio.Raw{format: :s16le, sample_rate: sample_rate, channels: channels}
+    
     {:send_buffer, {new_caps, decoded_audio}, %{state | queue: rest}}
   end
 
