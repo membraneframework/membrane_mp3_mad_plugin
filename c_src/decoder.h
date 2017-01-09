@@ -1,3 +1,8 @@
+/**
+ * Membrane Element: MP3 decoder - Erlang native interface for libmad-based decoder
+ *
+ * All Rights Reserved, (c) 2016 Marcin Lewandowski
+ */
 #ifndef __DECODER_H__
 #define __DECODER_H__
 

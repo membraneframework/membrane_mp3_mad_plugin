@@ -30,14 +30,9 @@ defmodule Membrane.Element.Mad.Decoder do
 
       {decoded_audio, bytes_used} ->
         << _used :: binary-size(bytes_used), rest :: binary >> = to_decode
-        
-        case DecoderNative.get_stream_info(native) do
-          {:ok, {sample_rate, channels}} -> 
-            new_caps = %Membrane.Caps.Audio.Raw{format: :s16le, sample_rate: sample_rate, channels: channels}
-            {:send_buffer, {new_caps, decoded_audio}, %{state | queue: rest}}
-        
-          {:error, any} -> {:error, any}
-        end    
+        new_caps = %Membrane.Caps.Audio.Raw{format: :s16le, sample_rate: 44100, channels: 2} #TODO get audio spec from frame
+        {:send_buffer, {new_caps, decoded_audio}, %{state | queue: rest}}   
+
     end
     
   end
@@ -58,16 +53,21 @@ defmodule Membrane.Element.Mad.Decoder do
   # non empty buffer
   defp decode_buffer(native, buffer, acc, bytes_used) when byte_size(buffer) > 0 do
     case DecoderNative.decode_frame(native, buffer) do
-
-      {:ok, {decoded_frame, frame_size}} ->
+      {:ok, {decoded_frame, frame_size, sample_rate, channels}} ->
         << _used :: binary-size(frame_size), rest :: binary >> = buffer
         decode_buffer(native, rest, acc <> decoded_frame, bytes_used + frame_size)
 
-      :buflen_error ->
+      {:error, :buflen} ->
         {acc, bytes_used}
 
-      {:error, desc} ->
-        {:error, desc}
+      {:error, {:recoverable, reason, bytes_to_skip}} ->
+        IO.puts("recoverable error")
+        << _used :: binary-size(bytes_to_skip), new_buffer :: binary >> = buffer
+        #TODO send discontinuity event
+        decode_buffer(native, new_buffer, acc, bytes_used + bytes_to_skip)
+
+      {:error, {:malformed, reason}} ->
+        {:error, reason}
     end
   end
 
