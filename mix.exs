@@ -34,6 +34,7 @@ defmodule Membrane.Element.Mad.Mixfile do
       {:membrane_caps_audio_mpeg, git: "git@bitbucket.org:radiokit/membrane-caps-audio-mpeg.git"},
       {:membrane_caps_audio_raw, git: "git@bitbucket.org:radiokit/membrane-caps-audio-raw.git"},
       {:membrane_common_c, git: "git@bitbucket.org:radiokit/membrane-common-c.git"},
+      {:espec, "~> 1.1.2", only: :test},
     ]
   end
 end

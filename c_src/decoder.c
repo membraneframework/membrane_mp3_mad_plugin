@@ -14,7 +14,6 @@ void res_decoder_handle_destructor(ErlNifEnv* env, void* value) {
   mad_stream_finish(handle->mad_stream);
   mad_frame_finish(handle->mad_frame);
   mad_synth_finish(handle->mad_synth);
-  free(handle);
 }
 
 int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
