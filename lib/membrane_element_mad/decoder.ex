@@ -30,7 +30,7 @@ defmodule Membrane.Element.Mad.Decoder do
 
       {decoded_audio, bytes_used} ->
         << _used :: binary-size(bytes_used), rest :: binary >> = to_decode
-        new_caps = %Membrane.Caps.Audio.Raw{format: :s16le, sample_rate: 44100, channels: 2} #TODO get audio spec from frame
+        new_caps = %Membrane.Caps.Audio.Raw{format: :s24le, sample_rate: 44100, channels: 2} #TODO get audio spec from frame
         {:send_buffer, {new_caps, decoded_audio}, %{state | queue: rest}}   
 
     end

@@ -7,6 +7,9 @@
 
 #define MEMBRANE_LOG_TAG "Membrane.Element.Mad.DecoderNative"
 
+//libmad produces 24-bit samples = 3 bytes
+#define BYTES_PER_SAMPLE 3
+
 ErlNifResourceType *RES_DECODER_HANDLE_TYPE;
 
 void res_decoder_handle_destructor(ErlNifEnv* env, void* value) {
@@ -47,9 +50,9 @@ static ERL_NIF_TERM export_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM a
 }
 
 
-static unsigned short fixed_to_s16le(mad_fixed_t sample) {
+static int fixed_to_s24le(mad_fixed_t sample) {
   /* round */
-  sample += (1L << (MAD_F_FRACBITS - 16));
+  sample += (1L << (MAD_F_FRACBITS - 24));
 
   /* Clipping */
   if(sample>=MAD_F_ONE)
@@ -58,12 +61,14 @@ static unsigned short fixed_to_s16le(mad_fixed_t sample) {
     return(-SHRT_MAX);
 
   /* quantize and scale */
-  unsigned short be = sample >> (MAD_F_FRACBITS + 1 - 16);
+  int be = sample >> (MAD_F_FRACBITS + 1 - 24);
   
   /* convert be to le */
   unsigned short le = be & 0xff;
   le <<= 8;
-  le += (be >> 8);
+  le += (be >> 8) & 0xff;
+  le <<= 8;
+  le += (be >> 16) & 0xff; 
   
   return le;
 }
@@ -151,7 +156,7 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
   
 
   int channels = MAD_NCHANNELS(&(mad_frame->header));
-  size_t decoded_frame_size = channels * mad_synth->pcm.length * sizeof(short);
+  size_t decoded_frame_size = channels * mad_synth->pcm.length * BYTES_PER_SAMPLE;
   
   ERL_NIF_TERM binary_term, output_term;
   unsigned char *data_ptr;
@@ -159,13 +164,15 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
 
 
   for (int i=0; i<mad_synth->pcm.length; i++) {
-    short pcm = fixed_to_s16le(mad_synth->pcm.samples[0][i]);
-    *(data_ptr++) = pcm >> 8;
+    int pcm = fixed_to_s24le(mad_synth->pcm.samples[0][i]);
+    *(data_ptr++) = (pcm >> 16) & 0xff;
+    *(data_ptr++) = (pcm >> 8) & 0xff;
     *(data_ptr++) = pcm & 0xff;
 
     if(channels == 2) {
-      pcm = fixed_to_s16le(mad_synth->pcm.samples[1][i]);
-      *(data_ptr++) = pcm >> 8;
+      pcm = fixed_to_s24le(mad_synth->pcm.samples[1][i]);
+      *(data_ptr++) = (pcm >> 16) & 0xff;
+      *(data_ptr++) = (pcm >> 8) & 0xff;
       *(data_ptr++) = pcm & 0xff;
     }
   }
