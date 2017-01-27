@@ -11,7 +11,7 @@ defmodule Membrane.Element.Mad.Mixfile do
      maintainers: ["Marcin Lewandowski", "Mateusz Nowak"],
      licenses: ["LGPL"],
      name: "Membrane Element: Mad",
-     source_url: "https://bitbucket.org/radiokit/membrane-element-mad",
+     source_url: "git@github.com:membraneframework/membrane-element-mad",
      preferred_cli_env: [espec: :test],
      deps: deps]
   end
@@ -30,10 +30,10 @@ defmodule Membrane.Element.Mad.Mixfile do
 
   defp deps do
     [
-      {:membrane_core, git: "git@bitbucket.org:radiokit/membrane-core.git"},
-      {:membrane_caps_audio_mpeg, git: "git@bitbucket.org:radiokit/membrane-caps-audio-mpeg.git"},
-      {:membrane_caps_audio_raw, git: "git@bitbucket.org:radiokit/membrane-caps-audio-raw.git"},
-      {:membrane_common_c, git: "git@bitbucket.org:radiokit/membrane-common-c.git"},
+      {:membrane_core, git: "git@github.com:membraneframework/membrane-core.git"},
+      {:membrane_caps_audio_mpeg, git: "git@github.com:membraneframework/membrane-caps-audio-mpeg.git"},
+      {:membrane_caps_audio_raw, git: "git@github.com:membraneframework/membrane-caps-audio-raw.git"},
+      {:membrane_common_c, git: "git@github.com:membraneframework/membrane-common-c.git"},
       {:espec, "~> 1.1.2", only: :test},
     ]
   end
