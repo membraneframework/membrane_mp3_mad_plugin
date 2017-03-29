@@ -3,14 +3,30 @@ defmodule Membrane.Element.Mad.Decoder do
   use Membrane.Element.Base.Filter
   alias Membrane.Element.Mad.DecoderNative
 
+  def_known_source_pads %{
+    :source => {:always, [
+      %Membrane.Caps.Audio.MPEG{
+        channels: 2,
+        sample_rate: 44100,
+      }
+    ]}
+  }
+
+  def_known_sink_pads %{
+    :sink => {:always, [
+      %Membrane.Caps.Audio.Raw{
+        format: :s24le,
+        sample_rate: 44100,
+        channels: 2,
+      }
+    ]}
+  }
+
   @doc false
   def handle_prepare(_state) do
     case DecoderNative.create() do
       {:ok, native} ->
-        {:ok, %{
-          native: native,
-          queue: << >>
-        }}
+        {:ok, %{native: native, queue: << >>}}
       {:error, reason} ->
         {:error, reason, %{
           native: nil,
@@ -20,21 +36,21 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
 
-  def handle_buffer(_caps, data, %{native: native, queue: queue} = state) do
+  def handle_buffer(:sink, _caps, %Membrane.Buffer{payload: data} = buffer, %{native: native, queue: queue} = state) do
     to_decode = queue <> data
 
     case decode_buffer(native, to_decode) do
-      
+
       {:error, desc} ->
         {:error, desc}
 
       {decoded_audio, bytes_used} ->
         << _used :: binary-size(bytes_used), rest :: binary >> = to_decode
-        new_caps = %Membrane.Caps.Audio.Raw{format: :s24le, sample_rate: 44100, channels: 2} #TODO get audio spec from frame
-        {:send_buffer, {new_caps, decoded_audio}, %{state | queue: rest}}   
+        #new_caps = %Membrane.Caps.Audio.Raw{format: :s24le, sample_rate: 44100, channels: 2} #TODO get audio spec from frame
+        {:ok, [{:send, {:source, %Membrane.Buffer{buffer | payload: decoded_audio}}}], %{state | queue: rest}}
 
     end
-    
+
   end
 
 
