@@ -5,19 +5,19 @@ defmodule Membrane.Element.Mad.Decoder do
 
   def_known_source_pads %{
     :source => {:always, [
-      %Membrane.Caps.Audio.MPEG{
-        channels: 2,
+      %Membrane.Caps.Audio.Raw{
+        format: :s24le,
         sample_rate: 44100,
+        channels: 2,
       }
     ]}
   }
 
   def_known_sink_pads %{
     :sink => {:always, [
-      %Membrane.Caps.Audio.Raw{
-        format: :s24le,
-        sample_rate: 44100,
+      %Membrane.Caps.Audio.MPEG{
         channels: 2,
+        sample_rate: 44100,
       }
     ]}
   }
