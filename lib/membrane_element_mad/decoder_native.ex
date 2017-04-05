@@ -1,9 +1,11 @@
 defmodule Membrane.Element.Mad.DecoderNative do
-  
+  require Bundlex.Loader
+
   @on_load :load_nifs
 
+  @doc false
   def load_nifs do
-    :ok = :erlang.load_nif('./membrane_element_mad_decoder', 0)
+    Bundlex.Loader.load_lib_nif!(:membrane_element_mad, :membrane_element_mad_decoder)
   end
 
   @doc """
@@ -17,7 +19,7 @@ defmodule Membrane.Element.Mad.DecoderNative do
 
 
   @doc """
-  Decodes one frame from input 
+  Decodes one frame from input
   Expects 2 arguments:
    - native resource
    - buffer to decode
