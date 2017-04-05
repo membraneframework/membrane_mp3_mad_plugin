@@ -22,16 +22,17 @@ defmodule Membrane.Element.Mad.Decoder do
     ]}
   }
 
+  def handle_init(_) do
+    {:ok, %{queue: <<>>, native: nil}}
+  end
+
   @doc false
-  def handle_prepare(_state) do
+  def handle_prepare(state) do
     case DecoderNative.create() do
       {:ok, native} ->
-        {:ok, %{native: native, queue: << >>}}
+        {:ok, %{state | native: native}}
       {:error, reason} ->
-        {:error, reason, %{
-          native: nil,
-          queue: << >>
-        }}
+        {:error, reason, state}
     end
   end
 
