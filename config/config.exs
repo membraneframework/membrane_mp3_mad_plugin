@@ -12,9 +12,9 @@ config :membrane_element_mad, :bundlex_lib,
           "decoder.c",
         ],
         libs: [
-          "mad"
         ],
         pkg_configs: [
+          "mad"
         ]
       ]
     ]
