@@ -3,21 +3,27 @@ defmodule Membrane.Element.Mad.DecoderSpec do
   alias Membrane.Element.Mad.DecoderNative
   require Membrane.Caps.Audio.MPEG
 
-  let :options, do: %{}
-
-  describe ".handle_prepare/1" do
+  describe ".handle_init/1" do
+    let :options, do: Nil
     it "should return ok result" do
-      expect(described_module.handle_prepare(options)).to be_ok_result
+      expect(described_module.handle_init(options)).to be_ok_result
     end
 
     it "should return queue as a bitstring" do
-      {:ok, %{queue: queue}} = described_module.handle_prepare(options)
+      {:ok, %{queue: queue}} = described_module.handle_init(options)
       expect(queue).to be_bitstring
     end
 
     it "should return empty queue" do
-      {:ok, %{queue: queue}} = described_module.handle_prepare(options)
+      {:ok, %{queue: queue}} = described_module.handle_init(options)
       expect(queue).to be_empty
+    end
+  end
+
+  describe ".handle_prepare/1" do
+    let :state, do: %{queue: <<>>, native: Nil}
+    it "should return ok result" do
+      expect(described_module.handle_prepare(state)).to be_ok_result
     end
   end
 
