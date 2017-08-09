@@ -13,7 +13,7 @@ defmodule Membrane.Element.Mad.Mixfile do
      name: "Membrane Element: Mad",
      source_url: "git@github.com:membraneframework/membrane-element-mad",
      preferred_cli_env: [espec: :test],
-     deps: deps]
+     deps: deps()]
   end
 
 
@@ -30,7 +30,7 @@ defmodule Membrane.Element.Mad.Mixfile do
 
   defp deps do
     [
-      {:membrane_core, git: "git@github.com:membraneframework/membrane-core.git"},
+      {:membrane_core, git: "git@github.com:membraneframework/membrane-core.git", branch: "feature/pull"},
       {:membrane_caps_audio_mpeg, git: "git@github.com:membraneframework/membrane-caps-audio-mpeg.git"},
       {:membrane_caps_audio_raw, git: "git@github.com:membraneframework/membrane-caps-audio-raw.git"},
       {:membrane_common_c, git: "git@github.com:membraneframework/membrane-common-c.git"},

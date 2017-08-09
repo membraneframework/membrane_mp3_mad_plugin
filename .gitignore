@@ -4,3 +4,4 @@
 /priv
 *.so
 *.dll
+.DS_Store

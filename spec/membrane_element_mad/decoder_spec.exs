@@ -23,7 +23,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
   describe ".handle_prepare/1" do
     let :state, do: %{queue: <<>>, native: Nil}
     it "should return ok result" do
-      expect(described_module.handle_prepare(state)).to be_ok_result
+      expect(described_module.handle_prepare(:stopped, state)).to be_ok_result
     end
   end
 
@@ -40,18 +40,18 @@ defmodule Membrane.Element.Mad.DecoderSpec do
       let :frame, do: <<255, 243, 20, 196, 0, 0, 0, 3, 72, 0, 0, 0, 0, 76, 65, 77, 69, 51, 46, 57, 54, 46, 49, 85, 255, 243, 20, 196, 11, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 22, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 33, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85 >>
 
         it "shoud return ok tuple" do
-          {result_atom, _decoded, _new_state} = described_module.handle_buffer(:sink, caps, buffer, state)
+          {result_atom, {_decoded, _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(result_atom).to eq(:ok)
         end
 
         it "should return non empty result" do
-          {_result_atom, [{:send, {:source, %Membrane.Buffer{payload: decoded}}}], _new_state} = described_module.handle_buffer(:sink, caps, buffer, state)
+          {_result_atom, {[buffer: {:source, %Membrane.Buffer{payload: decoded}}], _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(decoded).to be_bitstring
           expect byte_size(decoded) |> to(be :>, 0)
         end
 
         it "should return state with new queue" do
-          {_result_atom, _nbuf, %{queue: new_queue}} = described_module.handle_buffer(:sink, caps, buffer, state)
+          {_result_atom, {_nbuf, %{queue: new_queue}}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(new_queue).to be_bitstring
         end
 
@@ -75,18 +75,18 @@ defmodule Membrane.Element.Mad.DecoderSpec do
         let :frame, do: <<0, 0, 0, 76, 65, 77, 69, 51, 46, 57, 54, 46, 49, 85, 255, 243, 20, 196, 11, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 22, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 33, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85 >>
 
         it "shoud return ok tuple" do
-          {result_atom, _decoded, _new_state} = described_module.handle_buffer(:sink, caps, buffer, state)
+          {result_atom, {_decoded, _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(result_atom).to eq(:ok)
         end
 
         it "should return non empty result" do
-          {_result_atom, [{:send, {:source, %Membrane.Buffer{payload: decoded}}}], _new_state} = described_module.handle_buffer(:sink, caps, buffer, state)
+          {_result_atom, {[buffer: {:source, %Membrane.Buffer{payload: decoded}}], _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(decoded).to be_bitstring
           expect byte_size(decoded) |> to(be :>, 0)
         end
 
         it "should return state with new queue" do
-          {_result_atom, _nbuf, %{queue: new_queue}} = described_module.handle_buffer(:sink, caps, buffer, state)
+          {_result_atom, {_nbuf, %{queue: new_queue}}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(new_queue).to be_bitstring
         end
 
@@ -99,11 +99,11 @@ defmodule Membrane.Element.Mad.DecoderSpec do
         let :buffer, do: <<0,0>>
 
         pending "should return an ok result"
-        #  expect(described_module.handle_buffer(:sink, caps, buffer, state)).to be_ok_result
+        #  expect(described_module.handle_process1(:sink, buffer, %{caps: caps}, state)).to be_ok_result
         #end
 
         pending "should return new queue containing old queue concatenated with buffer"
-        #   {_result_atom, %{queue: new_queue}} = described_module.handle_buffer(:sink, caps, buffer, state)
+        #   {_result_atom, %{queue: new_queue}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
         #   expect(new_queue). to eq queue<>buffer
         #end
 
