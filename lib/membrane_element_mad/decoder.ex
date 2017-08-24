@@ -16,7 +16,7 @@ defmodule Membrane.Element.Mad.Decoder do
   }
 
   def_known_sink_pads %{
-    :sink => {:always, :pull, [
+    :sink => {:always, {:pull, demand_in: :buffers}, [
       %Membrane.Caps.Audio.MPEG{
         channels: 2,
         sample_rate: 44100,
@@ -38,8 +38,8 @@ defmodule Membrane.Element.Mad.Decoder do
   end
   def handle_prepare(_, state), do: {:ok, {[], state}}
 
-  def handle_demand(:source, size, _, state) do
-    {:ok, {[demand: {:sink, size}], state}}
+  def handle_demand(:source, _size, _unit, _, state) do
+    {:ok, {[demand: :sink], state}}
   end
 
   def handle_process1(:sink, %Buffer{payload: data} = buffer, _, %{native: native, queue: queue} = state) do
