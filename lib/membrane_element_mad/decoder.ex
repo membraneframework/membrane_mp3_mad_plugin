@@ -33,13 +33,15 @@ defmodule Membrane.Element.Mad.Decoder do
     with {:ok, native} <- DecoderNative.create
     do
       caps = %Caps.Audio.Raw{format: :s24le, sample_rate: 44100, channels: 2}
-      {:ok, {[caps: {:source, caps}], %{state | native: native}}}
+      {{:ok, caps: {:source, caps}}, %{state | native: native}}
+    else
+      {:error, reason} -> {{:error, reason}, state}
     end
   end
-  def handle_prepare(_, state), do: {:ok, {[], state}}
+  def handle_prepare(_, state), do: {:ok, state}
 
   def handle_demand(:source, _size, _unit, _, state) do
-    {:ok, {[demand: :sink], state}}
+    {{:ok, demand: :sink}, state}
   end
 
   def handle_process1(:sink, %Buffer{payload: data} = buffer, _, %{native: native, queue: queue} = state) do
@@ -49,10 +51,10 @@ defmodule Membrane.Element.Mad.Decoder do
     do
       << _used :: binary-size(bytes_used), rest :: binary >> = to_decode
       #TODO get audio spec from frame and send new caps
-      {:ok, {[buffer: {:source, %Buffer{buffer | payload: decoded_audio}}], %{state | queue: rest}}}
+      {{:ok, buffer: {:source, %Buffer{buffer | payload: decoded_audio}}}, %{state | queue: rest}}
     else
-      {:ok, {<<>>, 0}} -> {:ok, {[], %{state | queue: to_decode}}}
-      {:error, reason} -> {:error, reason}
+      {:ok, {<<>>, 0}} -> {:ok, %{state | queue: to_decode}}
+      {:error, reason} -> {{:error, reason}, state}
     end
 
   end
