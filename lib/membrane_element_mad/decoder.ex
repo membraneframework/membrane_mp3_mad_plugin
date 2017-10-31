@@ -42,7 +42,7 @@ defmodule Membrane.Element.Mad.Decoder do
   def handle_demand(:source, size, :buffers, _, state) do
     {{:ok, demand: {:sink, size}}, state}
   end
-  
+
   def handle_demand(:source, size, :bytes, _, state) do
     {{:ok, demand: {:sink, 1}}, state}
   end
@@ -57,8 +57,8 @@ defmodule Membrane.Element.Mad.Decoder do
       #TODO get audio spec from frame and send new caps
       {{:ok, buffer: {:source, %Buffer{buffer | payload: decoded_audio}}}, %{state | queue: rest}}
     else
-      {:ok, {<<>>, 0}} -> 
-        warn "No data was decoded, queue size #{byte_size(to_decode)}"
+      {:ok, {<<>>, 0}} ->
+        debug "MAD: no data was decoded, queue size #{byte_size(to_decode)}"
         {:ok, %{state | queue: to_decode}}
       {:error, reason} -> {{:error, reason}, state}
     end
