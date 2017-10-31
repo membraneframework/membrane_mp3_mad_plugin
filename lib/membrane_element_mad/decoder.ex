@@ -1,51 +1,55 @@
 
 defmodule Membrane.Element.Mad.Decoder do
   use Membrane.Element.Base.Filter
+  alias Membrane.Caps.Audio.{Raw, MPEG}
   alias Membrane.Element.Mad.DecoderNative
   alias Membrane.{Buffer, Caps}
   use Membrane.Mixins.Log
 
   def_known_source_pads %{
-    :source => {:always, :pull, [
-      %Membrane.Caps.Audio.Raw{
-        format: :s24le,
-        sample_rate: 44100,
-        channels: 2,
-      }
-    ]}
+    :source => {:always, :pull, :any}
   }
 
   def_known_sink_pads %{
-    :sink => {:always, {:pull, demand_in: :buffers}, [
-      %Membrane.Caps.Audio.MPEG{
-        channels: 2,
-        sample_rate: 44100,
-      }
-    ]}
+    :sink => {:always, {:pull, demand_in: :buffers}, :any}
   }
 
   def handle_init(_) do
-    {:ok, %{queue: <<>>, native: nil}}
+    {:ok, %{queue: <<>>, native: nil, caps: nil}}
   end
 
   @doc false
   def handle_prepare(:stopped, state) do
     with {:ok, native} <- DecoderNative.create
     do
-      caps = %Caps.Audio.Raw{format: :s24le, sample_rate: 44100, channels: 2}
-      {{:ok, caps: {:source, caps}}, %{state | native: native}}
+      {:ok, %{state | native: native}}
     else
       {:error, reason} -> {{:error, reason}, state}
     end
   end
   def handle_prepare(_, state), do: {:ok, state}
 
-  def handle_demand(:source, _size, _unit, _, state) do
-    {{:ok, demand: :sink}, state}
+  def handle_caps(:sink, %MPEG{ sample_rate: sample_rate, channels: channels } = caps , _options, %{caps: %MPEG{ sample_rate: old_sample_rate, channels: old_channels}} = state)
+  when (old_sample_rate != sample_rate or old_channels != channels or old_channels == nil or old_sample_rate == nil)
+  do
+      {{:ok, caps: {:source, %Raw{ format: :s24le, sample_rate: sample_rate, channels: channels }}}, %{ state | caps: caps } }
+  end
+  def handle_caps(:sink, %MPEG{sample_rate: sample_rate, channels: channels} = caps , _options, %{ caps: nil} = state) do
+    {{:ok, caps: {:source, %Raw{ format: :s24le, sample_rate: sample_rate, channels: channels }}}, state}
+  end
+  def handle_caps(:sink, %MPEG{} = caps , _options, state), do: {:ok, state}
+
+  def handle_demand(:source, size, :buffers, _, state) do
+    {{:ok, demand: {:sink, size}}, state}
+  end
+
+  def handle_demand(:source, size, :bytes, _, state) do
+    {{:ok, demand: {:sink, 1}}, state}
   end
 
   def handle_process1(:sink, %Buffer{payload: data} = buffer, _, %{native: native, queue: queue} = state) do
     to_decode = queue <> data
+    debug inspect {:handle_process, length: byte_size(to_decode)}
     with {:ok, {decoded_audio, bytes_used}} when bytes_used > 0
       <- decode_buffer(native, to_decode)
     do
@@ -53,7 +57,9 @@ defmodule Membrane.Element.Mad.Decoder do
       #TODO get audio spec from frame and send new caps
       {{:ok, buffer: {:source, %Buffer{buffer | payload: decoded_audio}}}, %{state | queue: rest}}
     else
-      {:ok, {<<>>, 0}} -> {:ok, %{state | queue: to_decode}}
+      {:ok, {<<>>, 0}} ->
+        debug "MAD: no data was decoded, queue size #{byte_size(to_decode)}"
+        {:ok, %{state | queue: to_decode}}
       {:error, reason} -> {{:error, reason}, state}
     end
 
@@ -91,7 +97,7 @@ defmodule Membrane.Element.Mad.Decoder do
         decode_buffer(native, new_buffer, acc, bytes_used + bytes_to_skip)
 
       {:error, {:malformed, reason}} ->
-        warn_error "Terminating stream becouse of malformed frame", reason
+        warn_error "Terminating stream because of malformed frame", reason
         {:error, reason}
     end
   end

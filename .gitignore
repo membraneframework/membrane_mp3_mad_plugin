@@ -5,3 +5,6 @@
 *.so
 *.dll
 .DS_Store
+bundlex.sh
+*.swo
+*.swp
