@@ -3,7 +3,7 @@ defmodule Membrane.Element.Mad.Decoder do
   use Membrane.Element.Base.Filter
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias Membrane.Element.Mad.DecoderNative
-  alias Membrane.{Buffer, Caps}
+  alias Membrane.Buffer
   use Membrane.Mixins.Log
 
   def_known_source_pads %{
@@ -15,7 +15,7 @@ defmodule Membrane.Element.Mad.Decoder do
   }
 
   def handle_init(_) do
-    {:ok, %{queue: <<>>, native: nil, caps: nil}}
+    {:ok, %{queue: <<>>, native: nil}}
   end
 
   @doc false
@@ -29,22 +29,29 @@ defmodule Membrane.Element.Mad.Decoder do
   end
   def handle_prepare(_, state), do: {:ok, state}
 
-  def handle_caps(:sink, %MPEG{ sample_rate: sample_rate, channels: channels } = caps , _options, %{caps: %MPEG{ sample_rate: old_sample_rate, channels: old_channels}} = state)
-  when (old_sample_rate != sample_rate or old_channels != channels or old_channels == nil or old_sample_rate == nil)
-  do
-      {{:ok, caps: {:source, %Raw{ format: :s24le, sample_rate: sample_rate, channels: channels }}}, %{ state | caps: caps } }
+
+  def handle_caps(
+    :sink,
+    %MPEG{sample_rate: sample_rate, channels: channels},
+    %{caps: %MPEG{sample_rate: sample_rate, channels: channels}},
+    state
+  ) do
+    {:ok, state}
   end
-  def handle_caps(:sink, %MPEG{sample_rate: sample_rate, channels: channels} = caps , _options, %{ caps: nil} = state) do
-    {{:ok, caps: {:source, %Raw{ format: :s24le, sample_rate: sample_rate, channels: channels }}}, state}
+
+  def handle_caps(
+    :sink, %MPEG{sample_rate: sample_rate, channels: channels}, _, state
+  ) do
+    raw = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
+    {{:ok, caps: {:source, raw}}, state}
   end
-  def handle_caps(:sink, %MPEG{} = caps , _options, state), do: {:ok, state}
 
   def handle_demand(:source, size, :buffers, _, state) do
     {{:ok, demand: {:sink, size}}, state}
   end
 
-  def handle_demand(:source, size, :bytes, _, state) do
-    {{:ok, demand: {:sink, 1}}, state}
+  def handle_demand(:source, _size, :bytes, _, state) do
+    {{:ok, demand: :sink}, state}
   end
 
   def handle_process1(:sink, %Buffer{payload: data} = buffer, _, %{native: native, queue: queue} = state) do
