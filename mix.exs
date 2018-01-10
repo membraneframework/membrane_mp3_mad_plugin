@@ -18,7 +18,7 @@ defmodule Membrane.Element.Mad.Mixfile do
 
 
   def application do
-    [applications: [
+    [extra_applications: [
       :membrane_core
     ], mod: {Membrane.Element.Mad, []}]
   end
