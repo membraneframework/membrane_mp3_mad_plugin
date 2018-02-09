@@ -10,6 +10,7 @@ config :membrane_element_mad, :bundlex_lib,
         ],
         sources: [
           "decoder.c",
+          "../../membrane_common_c/c_src/membrane/log.c",
         ],
         libs: [
         ],
@@ -28,6 +29,7 @@ config :membrane_element_mad, :bundlex_lib,
           ],
           sources: [
             "decoder.c",
+            "../../membrane_common_c/c_src/membrane/log.c",
           ],
           libs: [
           ],
@@ -37,4 +39,3 @@ config :membrane_element_mad, :bundlex_lib,
         ]
       ]
     ]
-  
