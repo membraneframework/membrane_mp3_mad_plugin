@@ -14,12 +14,18 @@ ErlNifResourceType *RES_DECODER_HANDLE_TYPE;
 void res_decoder_handle_destructor(ErlNifEnv* env, void* value) {
   DecoderHandle *handle = (DecoderHandle*) value;
   if(handle) {
-    if(!handle->mad_stream) printf("MAD: mad_stream is null");
-    mad_stream_finish(handle->mad_stream);
-    if(!handle->mad_frame) printf("MAD: mad_frame is null");
-    mad_frame_finish(handle->mad_frame);
-    if(!handle->mad_synth) printf("MAD: mad_synth is null");
-    mad_synth_finish(handle->mad_synth);
+    if(handle->mad_stream){
+      mad_stream_finish(handle->mad_stream);
+      free(handle->mad_stream);
+    }
+    if(handle->mad_frame){
+      mad_frame_finish(handle->mad_frame);
+      free(handle->mad_frame);
+    }
+    if(handle->mad_synth){
+      mad_synth_finish(handle->mad_synth);
+      free(handle->mad_synth);
+    }
   } else {
     MEMBRANE_WARN(env, "MAD: Decoder handle already released");
   }
