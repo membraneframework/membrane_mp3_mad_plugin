@@ -32,7 +32,7 @@ defmodule Membrane.Element.Mad.Mixfile do
     [
       {:membrane_core, git: "git@github.com:membraneframework/membrane-core.git"},
       {:membrane_caps_audio_mpeg, git: "git@github.com:membraneframework/membrane-caps-audio-mpeg.git"},
-      {:membrane_caps_audio_raw, git: "git@github.com:membraneframework/membrane-caps-audio-raw.git", branch: "feature/improvements"},
+      {:membrane_caps_audio_raw, git: "git@github.com:membraneframework/membrane-caps-audio-raw.git"},
       {:membrane_common_c, git: "git@github.com:membraneframework/membrane-common-c.git"},
       {:bundlex, git: "git@github.com:radiokit/bundlex.git"},
       {:espec, "~> 1.1.2", only: :test},
