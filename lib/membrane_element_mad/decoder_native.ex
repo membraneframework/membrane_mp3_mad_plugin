@@ -13,10 +13,8 @@ defmodule Membrane.Element.Mad.DecoderNative do
   No arugments are expected
   On success, should return {:ok, decoder_handle}
   """
-  @spec create() ::
-  {:ok, any}
-  def create(), do: raise "NIF fail"
-
+  @spec create() :: {:ok, any}
+  def create(), do: raise("NIF fail")
 
   @doc """
   Decodes one frame from input
@@ -32,7 +30,6 @@ defmodule Membrane.Element.Mad.DecoderNative do
    - {:error, {:malformed, reason}}
   """
   @spec decode_frame(any, bitstring) ::
-  {:ok, {bitstring, non_neg_integer, non_neg_integer, non_neg_integer}} | {:error, any}
-  def decode_frame(_native, _data), do: raise "NIF fail"
-
+          {:ok, {bitstring, non_neg_integer, non_neg_integer, non_neg_integer}} | {:error, any}
+  def decode_frame(_native, _data), do: raise("NIF fail")
 end

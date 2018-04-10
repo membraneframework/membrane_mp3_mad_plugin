@@ -6,14 +6,13 @@ config :membrane_element_mad, :bundlex_lib,
       membrane_element_mad_decoder: [
         includes: [
           "../membrane_common_c/c_src",
-          "./deps/membrane_common_c/c_src",
+          "./deps/membrane_common_c/c_src"
         ],
         sources: [
           "decoder.c",
-          "../../membrane_common_c/c_src/membrane/log.c",
+          "../../membrane_common_c/c_src/membrane/log.c"
         ],
-        libs: [
-        ],
+        libs: [],
         pkg_configs: [
           "mad"
         ]
@@ -22,20 +21,19 @@ config :membrane_element_mad, :bundlex_lib,
   ],
   linux: [
     nif: [
-        membrane_element_mad_decoder: [
-          includes: [
-            "../membrane_common_c/c_src",
-            "./deps/membrane_common_c/c_src",
-          ],
-          sources: [
-            "decoder.c",
-            "../../membrane_common_c/c_src/membrane/log.c",
-          ],
-          libs: [
-          ],
-          pkg_configs: [
-            "mad"
-          ]
+      membrane_element_mad_decoder: [
+        includes: [
+          "../membrane_common_c/c_src",
+          "./deps/membrane_common_c/c_src"
+        ],
+        sources: [
+          "decoder.c",
+          "../../membrane_common_c/c_src/membrane/log.c"
+        ],
+        libs: [],
+        pkg_configs: [
+          "mad"
         ]
       ]
     ]
+  ]
