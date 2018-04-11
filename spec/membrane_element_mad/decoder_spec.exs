@@ -40,18 +40,18 @@ defmodule Membrane.Element.Mad.DecoderSpec do
       let :frame, do: <<255, 243, 20, 196, 0, 0, 0, 3, 72, 0, 0, 0, 0, 76, 65, 77, 69, 51, 46, 57, 54, 46, 49, 85, 255, 243, 20, 196, 11, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 22, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 33, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85 >>
 
         it "shoud return ok tuple" do
-          {result_atom, {_decoded, _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
+          {{result_atom, _decoded}, _new_state} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(result_atom).to eq(:ok)
         end
 
         it "should return non empty result" do
-          {_result_atom, {[buffer: {:source, %Membrane.Buffer{payload: decoded}}], _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
+          {{_result_atom, [buffer: {:source, %Membrane.Buffer{payload: decoded}}]}, _new_state} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(decoded).to be_bitstring
           expect byte_size(decoded) |> to(be :>, 0)
         end
 
         it "should return state with new queue" do
-          {_result_atom, {_nbuf, %{queue: new_queue}}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
+          {{_result_atom, _nbuf}, %{queue: new_queue}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(new_queue).to be_bitstring
         end
 
@@ -75,18 +75,18 @@ defmodule Membrane.Element.Mad.DecoderSpec do
         let :frame, do: <<0, 0, 0, 76, 65, 77, 69, 51, 46, 57, 54, 46, 49, 85, 255, 243, 20, 196, 11, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 22, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 255, 243, 20, 196, 33, 0, 0, 3, 72, 0, 0, 0, 0, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85 >>
 
         it "shoud return ok tuple" do
-          {result_atom, {_decoded, _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
+          {{result_atom, _decoded}, _new_state} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(result_atom).to eq(:ok)
         end
 
         it "should return non empty result" do
-          {_result_atom, {[buffer: {:source, %Membrane.Buffer{payload: decoded}}], _new_state}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
+          {{_result_atom, [buffer: {:source, %Membrane.Buffer{payload: decoded}}]}, _new_state} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(decoded).to be_bitstring
           expect byte_size(decoded) |> to(be :>, 0)
         end
 
         it "should return state with new queue" do
-          {_result_atom, {_nbuf, %{queue: new_queue}}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
+          {{_result_atom, _nbuf}, %{queue: new_queue}} = described_module.handle_process1(:sink, buffer, %{caps: caps}, state)
           expect(new_queue).to be_bitstring
         end
 

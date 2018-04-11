@@ -1,23 +1,29 @@
 defmodule Membrane.Element.Mad.Decoder do
+  @moduledoc """
+  Decodes MPEG audio to raw data in S24LE format
+  """
   use Membrane.Element.Base.Filter
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias Membrane.Element.Mad.DecoderNative
   alias Membrane.Buffer
   use Membrane.Mixins.Log
 
+  def_options []
+
   def_known_source_pads %{
     :source => {:always, :pull, :any}
   }
 
   def_known_sink_pads %{
-    :sink => {:always, {:pull, demand_in: :buffers}, :any}
+    :sink => {:always, {:pull, demand_in: :buffers}, {Raw, format: :s24le}}
   }
 
+  @impl true
   def handle_init(_) do
     {:ok, %{queue: <<>>, native: nil}}
   end
 
-  @doc false
+  @impl true
   def handle_prepare(:stopped, state) do
     with {:ok, native} <- DecoderNative.create() do
       {:ok, %{state | native: native}}
@@ -28,6 +34,7 @@ defmodule Membrane.Element.Mad.Decoder do
 
   def handle_prepare(_, state), do: {:ok, state}
 
+  @impl true
   def handle_caps(
         :sink,
         %MPEG{sample_rate: sample_rate, channels: channels},
@@ -47,6 +54,7 @@ defmodule Membrane.Element.Mad.Decoder do
     {{:ok, caps: {:source, raw}}, state}
   end
 
+  @impl true
   def handle_demand(:source, size, :buffers, _, state) do
     {{:ok, demand: {:sink, size}}, state}
   end
@@ -55,6 +63,7 @@ defmodule Membrane.Element.Mad.Decoder do
     {{:ok, demand: :sink}, state}
   end
 
+  @impl true
   def handle_process1(
         :sink,
         %Buffer{payload: data} = buffer,

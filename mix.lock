@@ -2,7 +2,7 @@
   "bimap": {:hex, :bimap, "0.1.1", "f0406e59f65ba903af678383d2356d0a6e59fb794adc1a7dd32bd8fabe0f028f", [:mix], [], "hexpm"},
   "bundlex": {:git, "git@github.com:radiokit/bundlex.git", "b8fa91e6bf29eb7cd5913a704d045ad40c0c15f2", []},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], []},
-  "espec": {:hex, :espec, "1.1.2", "d1cf60ee8f6fb8b0f1593097958762f870949238b0aa15788201728cb6e672dd", [:mix], [{:meck, "~> 0.8.4", [hex: :meck, repo: "hexpm", optional: false]}], "hexpm"},
+  "espec": {:hex, :espec, "1.5.0", "0a6bee7360b478d7267df7f823107b458923f49841e4b96747bcb442108104d2", [:mix], [{:meck, "0.8.9", [hex: :meck, repo: "hexpm", optional: false]}], "hexpm"},
   "meck": {:hex, :meck, "0.8.9", "64c5c0bd8bcca3a180b44196265c8ed7594e16bcc845d0698ec6b4e577f48188", [:rebar3], [], "hexpm"},
   "membrane_caps_audio_mpeg": {:git, "git@github.com:membraneframework/membrane-caps-audio-mpeg.git", "032d68bfc2d70a935c3cb507d9797563c4211882", []},
   "membrane_caps_audio_raw": {:git, "git@github.com:membraneframework/membrane-caps-audio-raw.git", "3875c1496a30b9ab304ef594981e2e212a0cf6e5", []},

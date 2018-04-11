@@ -204,8 +204,8 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
 
 static ErlNifFunc nif_funcs[] =
 {
-  {"create", 0, export_create},
-  {"decode_frame", 2, export_decode_frame}
+  {"create", 0, export_create, 0},
+  {"decode_frame", 2, export_decode_frame, 0}
 };
 
 ERL_NIF_INIT(Elixir.Membrane.Element.Mad.DecoderNative, nif_funcs, load, NULL, NULL, NULL)
