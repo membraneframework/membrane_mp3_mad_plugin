@@ -2,6 +2,10 @@
 
 This package provides elements that can be used to decode MPEG audio with libmad.
 
+# Decoding caps
+
+For now, decoder doesn't support decoding caps from MPEG frames. To receive valid caps on `sink` pad, decoder must be placed in the pipeline after `Membrane.Element.MPEGAudioParse.Parser`. 
+
 # Sample usage
 
 Playing below pipeline should read `input.mp3`, decode and save raw payload to `output`:
