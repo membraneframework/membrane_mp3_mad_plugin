@@ -1,6 +1,6 @@
 [
   inputs: [
-    "{lib,test,spec,config}/**/*.{ex,exs}",
+    "{lib,test,config}/**/*.{ex,exs}",
     "mix.exs"
   ],
   import_deps: [:membrane_core]
