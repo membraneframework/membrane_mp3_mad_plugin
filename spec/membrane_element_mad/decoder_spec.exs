@@ -122,7 +122,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
 
         pending "should return an ok result"
 
-       #  expect(described_module().handle_process1(:sink, buffer, %{caps: caps()}, state())).to be_ok_result
+        #  expect(described_module().handle_process1(:sink, buffer, %{caps: caps()}, state())).to be_ok_result
         # end
 
         pending "should return new queue containing old queue concatenated with buffer"
