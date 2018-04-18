@@ -7,17 +7,17 @@ defmodule Membrane.Element.Mad.DecoderSpec do
     let :options, do: Nil
 
     it "should return ok result" do
-      expect(described_module().handle_init(options())).to(be_ok_result())
+      expect(described_module().handle_init(options())) |> to(be_ok_result())
     end
 
     it "should return queue as a bitstring" do
       {:ok, %{queue: queue}} = described_module().handle_init(options())
-      expect(queue).to(be_bitstring())
+      expect(queue) |> to(be_bitstring())
     end
 
     it "should return empty queue" do
       {:ok, %{queue: queue}} = described_module().handle_init(options())
-      expect(queue).to(be_empty())
+      expect(queue) |> to(be_empty())
     end
   end
 
@@ -25,7 +25,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
     let :state, do: %{queue: <<>>, native: Nil}
 
     it "should return ok result" do
-      expect(described_module().handle_prepare(:stopped, state())).to(be_ok_result())
+      expect(described_module().handle_prepare(:stopped, state())) |> to(be_ok_result())
     end
   end
 
@@ -51,14 +51,14 @@ defmodule Membrane.Element.Mad.DecoderSpec do
           {{result_atom, _decoded}, _new_state} =
             described_module().handle_process1(:sink, buffer(), %{caps: caps()}, state())
 
-          expect(result_atom).to(eq(:ok))
+          expect(result_atom) |> to(eq(:ok))
         end
 
         it "should return non empty result" do
           {{_result_atom, [buffer: {:source, %Membrane.Buffer{payload: decoded}}]}, _new_state} =
             described_module().handle_process1(:sink, buffer(), %{caps: caps()}, state())
 
-          expect(decoded).to(be_bitstring())
+          expect(decoded) |> to(be_bitstring())
           expect(byte_size(decoded) |> to(be :>, 0))
         end
 
@@ -66,7 +66,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
           {{_result_atom, _nbuf}, %{queue: new_queue}} =
             described_module().handle_process1(:sink, buffer(), %{caps: caps()}, state())
 
-          expect(new_queue).to(be_bitstring())
+          expect(new_queue) |> to(be_bitstring())
         end
 
         pending "should return caps with proper channels number"
@@ -95,14 +95,14 @@ defmodule Membrane.Element.Mad.DecoderSpec do
           {{result_atom, _decoded}, _new_state} =
             described_module().handle_process1(:sink, buffer(), %{caps: caps()}, state())
 
-          expect(result_atom).to(eq(:ok))
+          expect(result_atom) |> to(eq(:ok))
         end
 
         it "should return non empty result" do
           {{_result_atom, [buffer: {:source, %Membrane.Buffer{payload: decoded}}]}, _new_state} =
             described_module().handle_process1(:sink, buffer(), %{caps: caps()}, state())
 
-          expect(decoded).to(be_bitstring())
+          expect(decoded) |> to(be_bitstring())
           expect(byte_size(decoded) |> to(be :>, 0))
         end
 
@@ -110,7 +110,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
           {{_result_atom, _nbuf}, %{queue: new_queue}} =
             described_module().handle_process1(:sink, buffer(), %{caps: caps()}, state())
 
-          expect(new_queue).to(be_bitstring())
+          expect(new_queue) |> to(be_bitstring())
         end
 
         pending "should return caps with proper channels number"
@@ -122,7 +122,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
 
         pending "should return an ok result"
 
-        #  expect(described_module().handle_process1(:sink, buffer, %{caps: caps()}, state())).to be_ok_result
+        #  expect(described_module().handle_process1(:sink, buffer, %{caps: caps()}, state())) |> to(be_ok_result)
         # end
 
         pending "should return new queue containing old queue concatenated with buffer"

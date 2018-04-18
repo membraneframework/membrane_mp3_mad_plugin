@@ -14,9 +14,7 @@ defmodule Membrane.Element.Mad.Decoder do
     {:source, {:always, :pull, :any}}
   ]
 
-  def_known_sink_pads [
-    {:sink, {:always, {:pull, demand_in: :buffers}, {Raw, format: :s24le}}}
-  ]
+  def_known_sink_pads sink: {:always, {:pull, demand_in: :buffers}, {Raw, format: :s24le}}
 
   @impl true
   def handle_init(_) do
