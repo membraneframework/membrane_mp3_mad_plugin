@@ -92,8 +92,16 @@ defmodule Membrane.Element.Mad.Decoder do
       {:error, {:recoverable, reason, bytes_to_skip}} ->
         warn_error("Skipping malformed frame (#{bytes_to_skip} bytes)", reason)
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
-        discontinuity = {:event, {:source, Membrane.Event.discontinuity(nil)}}
-        decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
+
+        case acc |> List.first() do
+          {:event, _} ->
+            # send only one discontinuity event in a row
+            decode_buffer(native, new_buffer, previous_caps, acc)
+
+          _ ->
+            discontinuity = {:event, {:source, Membrane.Event.discontinuity(nil)}}
+            decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
+        end
 
       {:error, {:malformed, reason}} ->
         warn_error("Terminating stream because of malformed frame", reason)
