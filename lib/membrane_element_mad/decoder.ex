@@ -88,10 +88,10 @@ defmodule Membrane.Element.Mad.Decoder do
         {:ok, {buffer, acc, previous_caps}}
 
       {:error, {:recoverable, reason, bytes_to_skip}} ->
-        uwarn_error("Skipping malformed frame", reason)
+        #warn_error("Skipping malformed frame", reason)
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
-        # TODO send discontinuity event
-        decode_buffer(native, new_buffer, previous_caps, acc)
+        discontinuity = {:event, {:source, Membrane.Event.discontinuity(nil)}}
+        decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
 
       {:error, {:malformed, reason}} ->
         warn_error("Terminating stream because of malformed frame", reason)
