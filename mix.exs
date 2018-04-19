@@ -13,7 +13,7 @@ defmodule Membrane.Element.Mad.Mixfile do
       licenses: ["Apache 2.0"],
       name: "Membrane Element: Mad",
       source_url: "git@github.com:membraneframework/membrane-element-mad",
-      preferred_cli_env: [espec: :test],
+      preferred_cli_env: [espec: :test, format: :test],
       deps: deps()
     ]
   end
