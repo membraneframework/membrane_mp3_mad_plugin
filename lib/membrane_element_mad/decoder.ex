@@ -11,10 +11,10 @@ defmodule Membrane.Element.Mad.Decoder do
   def_options []
 
   def_known_source_pads [
-    {:source, {:always, :pull, :any}}
+    {:source, {:always, :pull, {Raw, format: :s24le}}}
   ]
 
-  def_known_sink_pads sink: {:always, {:pull, demand_in: :buffers}, {Raw, format: :s24le}}
+  def_known_sink_pads sink: {:always, {:pull, demand_in: :buffers}, [:any, MPEG]}
 
   @impl true
   def handle_init(_) do
@@ -48,7 +48,7 @@ defmodule Membrane.Element.Mad.Decoder do
 
     case decode_buffer(state.native, state.source_caps, to_decode) do
       {:ok, {new_queue, commands, new_caps}} ->
-        commands_reversed = commands |> Enum.reverse
+        commands_reversed = commands |> Enum.reverse()
         {{:ok, commands_reversed}, %{state | source_caps: new_caps, queue: new_queue}}
 
       {:error, reason} ->
@@ -74,7 +74,9 @@ defmodule Membrane.Element.Mad.Decoder do
 
       new_acc =
         case new_caps do
-          ^previous_caps -> acc
+          ^previous_caps ->
+            acc
+
           _ ->
             [{:caps, {:source, new_caps}} | acc]
         end
@@ -88,7 +90,7 @@ defmodule Membrane.Element.Mad.Decoder do
         {:ok, {buffer, acc, previous_caps}}
 
       {:error, {:recoverable, reason, bytes_to_skip}} ->
-        #warn_error("Skipping malformed frame", reason)
+        warn_error("Skipping malformed frame (#{bytes_to_skip} bytes)", reason)
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
         discontinuity = {:event, {:source, Membrane.Event.discontinuity(nil)}}
         decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
