@@ -5,7 +5,7 @@ defmodule Membrane.Element.Mad.DecoderNative do
 
   @doc false
   def load_nifs do
-    Bundlex.Loader.load_lib_nif!(:membrane_element_mad, :membrane_element_mad_decoder)
+    Bundlex.Loader.load_nif!(:membrane_element_mad, :decoder)
   end
 
   @doc """
