@@ -1,6 +1,6 @@
 defmodule Membrane.Element.Mad.DecoderSpec do
   use ESpec, asyn: true
-  alias Membrane.Element.Mad.DecoderNative
+  alias Membrane.Element.Mad.Decoder.Native
   require Membrane.Caps.Audio.MPEG
 
   @minimal_mpeg_frame <<255, 243, 20, 196, 0, 0, 0, 3, 72, 0, 0, 0, 0, 76, 65, 77, 69, 51, 46, 57,
@@ -41,7 +41,7 @@ defmodule Membrane.Element.Mad.DecoderSpec do
     let :channels, do: 2
     let :caps, do: %Membrane.Caps.Audio.MPEG{channels: channels()}
     let :context, do: %{}
-    let :native, do: elem(DecoderNative.create(), 1)
+    let :native, do: elem(Native.create(), 1)
     let :buffer, do: %Membrane.Buffer{payload: frame()}
 
     context "queue is empty" do

@@ -4,7 +4,7 @@ defmodule Membrane.Element.Mad.Decoder do
   """
   use Membrane.Element.Base.Filter
   alias Membrane.Caps.Audio.{Raw, MPEG}
-  alias Membrane.Element.Mad.DecoderNative
+  alias __MODULE__.Native
   alias Membrane.Buffer
   use Membrane.Mixins.Log
 
@@ -23,7 +23,7 @@ defmodule Membrane.Element.Mad.Decoder do
 
   @impl true
   def handle_prepare(:stopped, state) do
-    with {:ok, native} <- DecoderNative.create() do
+    with {:ok, native} <- Native.create() do
       {:ok, %{state | native: native}}
     else
       {:error, reason} -> {{:error, reason}, state}
@@ -69,7 +69,7 @@ defmodule Membrane.Element.Mad.Decoder do
   # non empty buffer
   defp decode_buffer(native, buffer, previous_caps, acc) when byte_size(buffer) > 0 do
     with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
-           DecoderNative.decode_frame(native, buffer) do
+           Native.decode_frame(native, buffer) do
       new_caps = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
 
       new_acc =

@@ -1,12 +1,5 @@
-defmodule Membrane.Element.Mad.DecoderNative do
-  require Bundlex.Loader
-
-  @on_load :load_nifs
-
-  @doc false
-  def load_nifs do
-    Bundlex.Loader.load_nif!(:membrane_element_mad, :decoder)
-  end
+defmodule Membrane.Element.Mad.Decoder.Native do
+  use Bundlex.Loader, nif: :decoder
 
   @doc """
   Initializes mad_stream, mad_frame, mad_synth and returns DecoderHandle resource
@@ -14,7 +7,7 @@ defmodule Membrane.Element.Mad.DecoderNative do
   On success, should return {:ok, decoder_handle}
   """
   @spec create() :: {:ok, any}
-  def create(), do: raise("NIF fail")
+  defnif create()
 
   @doc """
   Decodes one frame from input
@@ -31,5 +24,5 @@ defmodule Membrane.Element.Mad.DecoderNative do
   """
   @spec decode_frame(any, bitstring) ::
           {:ok, {bitstring, non_neg_integer, non_neg_integer, non_neg_integer}} | {:error, any}
-  def decode_frame(_native, _data), do: raise("NIF fail")
+  defnif decode_frame(native, data)
 end

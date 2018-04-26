@@ -1,7 +1,7 @@
 [
   inputs: [
     "{lib,test,spec,config}/**/*.{ex,exs}",
-    "mix.exs"
+    "*.exs"
   ],
-  import_deps: [:membrane_core, :espec]
+  import_deps: [:membrane_core, :espec, :bundlex]
 ]

@@ -1,8 +1,9 @@
 defmodule Membrane.Element.Mad.BundlexProject do
   use Bundlex.Project
+
   def project() do
     [
-      nifs: nifs(Bundlex.platform)
+      nifs: nifs(Bundlex.platform())
     ]
   end
 
