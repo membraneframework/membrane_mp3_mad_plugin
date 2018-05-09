@@ -6,6 +6,8 @@
 
 #include "decoder.h"
 
+#define UNUSED(x) (void)(x)
+
 //libmad produces 24-bit samples = 3 bytes
 #define BYTES_PER_SAMPLE 3
 
@@ -32,6 +34,9 @@ void res_decoder_handle_destructor(ErlNifEnv* env, void* value) {
 }
 
 int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
+  UNUSED(load_info);
+  UNUSED(priv_data);
+
   int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
   RES_DECODER_HANDLE_TYPE =
     enif_open_resource_type(env, NULL, "DecoderHandle", res_decoder_handle_destructor, flags, NULL);
@@ -45,6 +50,9 @@ int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
  * On success, should return {:ok, decoder_handle}
  */
 static ERL_NIF_TERM export_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+  UNUSED(argc);
+  UNUSED(argv);
+
   DecoderHandle *handle = enif_alloc_resource(RES_DECODER_HANDLE_TYPE, sizeof(DecoderHandle));
 
   handle->mad_stream = malloc(sizeof(struct mad_stream));
@@ -131,6 +139,8 @@ static ERL_NIF_TERM create_mad_stream_error(ErlNifEnv* env, struct mad_stream* m
  */
 static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
+  UNUSED(argc);
+
   DecoderHandle *handle;
   ErlNifBinary buffer;
   size_t bytes_used;
@@ -204,8 +214,8 @@ static ERL_NIF_TERM export_decode_frame(ErlNifEnv* env, int argc, const ERL_NIF_
 
 static ErlNifFunc nif_funcs[] =
 {
-  {"create", 0, export_create},
-  {"decode_frame", 2, export_decode_frame}
+  {"create", 0, export_create, 0},
+  {"decode_frame", 2, export_decode_frame, 0}
 };
 
-ERL_NIF_INIT(Elixir.Membrane.Element.Mad.DecoderNative, nif_funcs, load, NULL, NULL, NULL)
+ERL_NIF_INIT(Elixir.Membrane.Element.Mad.Decoder.Native.Nif, nif_funcs, load, NULL, NULL, NULL)
