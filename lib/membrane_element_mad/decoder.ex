@@ -8,8 +8,6 @@ defmodule Membrane.Element.Mad.Decoder do
   alias Membrane.Buffer
   use Membrane.Mixins.Log
 
-  def_options []
-
   def_known_source_pads source: {:always, :pull, {Raw, format: :s24le}}
 
   def_known_sink_pads sink: {:always, {:pull, demand_in: :buffers}, [:any, MPEG]}

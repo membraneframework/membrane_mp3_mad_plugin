@@ -4,7 +4,7 @@ This package provides elements that can be used to decode MPEG audio with libmad
 
 # Decoding caps
 
-For now, decoder doesn't support decoding caps from MPEG frames. To receive valid caps on `sink` pad, decoder must be placed in the pipeline after `Membrane.Element.MPEGAudioParse.Parser`. 
+For now, decoder doesn't support decoding caps from MPEG frames. To receive valid caps on `sink` pad, decoder must be placed in the pipeline after `Membrane.Element.MPEGAudioParse.Parser`.
 
 # Sample usage
 
@@ -20,7 +20,7 @@ defmodule MadExamplePipeline do
   def handle_init(_) do
     children = [
       src: %File.Source{location: "input.mp3"},
-      decoder: %Mad.Decoder{},
+      decoder: Mad.Decoder,
       sink: %File.Sink{location: "output"},
     ]
     links = %{
