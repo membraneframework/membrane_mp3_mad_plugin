@@ -10,8 +10,7 @@ defmodule Membrane.Element.Mad.Mixfile do
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       description: "Membrane Multimedia Framework (Mad Element)",
-      maintainers: ["Membrane Team"],
-      licenses: ["Apache 2.0"],
+      package: package(),
       name: "Membrane Element: Mad",
       source_url: "git@github.com:membraneframework/membrane-element-mad",
       preferred_cli_env: [espec: :test, format: :test],
@@ -21,15 +20,20 @@ defmodule Membrane.Element.Mad.Mixfile do
 
   def application do
     [
-      extra_applications: [
-        :membrane_core
-      ],
+      extra_applications: [],
       mod: {Membrane.Element.Mad, []}
     ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp package do
+    [
+      maintainers: ["Membrane Team"],
+      licenses: ["Apache 2.0"]
+    ]
+  end
 
   defp deps do
     [
