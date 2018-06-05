@@ -1,4 +1,7 @@
 defmodule Membrane.Element.Mad.Decoder.Native do
+  @moduledoc """
+  Wrapper for native implementation of decoder
+  """
   use Bundlex.Loader, nif: :decoder
 
   @doc """
