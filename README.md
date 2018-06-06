@@ -1,12 +1,22 @@
 # Membrane Multimedia Framework: Mad Element
 
-This package provides elements that can be used to decode MPEG audio with libmad.
+This package provides [Membrane Multimedia Framework](https://membraneframework.org)
+elements that can be used to decode MPEG audio using MAD library.
 
-# Decoding caps
+Documentation is available at [HexDocs](https://hexdocs.pm/membrane_element_mad/)
 
-For now, decoder doesn't support decoding caps from MPEG frames. To receive valid caps on `sink` pad, decoder must be placed in the pipeline after `Membrane.Element.MPEGAudioParse.Parser`.
 
-# Sample usage
+## Installation
+
+Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
+
+```elixir
+{:membrane_element_mad, "~> 0.1"}
+```
+
+You also need to have [MAD](https://www.underbit.com/products/mad/) installed.
+
+## Sample usage
 
 Playing below pipeline should read `input.mp3`, decode and save raw payload to `output`:
 
