@@ -1,5 +1,7 @@
 # Membrane Multimedia Framework: Mad Element
 
+[![Build Status](https://travis-ci.com/membraneframework/membrane-element-mad.svg?branch=master)](https://travis-ci.com/membraneframework/membrane-element-mad)
+
 This package provides [Membrane Multimedia Framework](https://membraneframework.org)
 elements that can be used to decode MPEG audio using MAD library.
 
