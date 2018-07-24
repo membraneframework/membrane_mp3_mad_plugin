@@ -1,6 +1,6 @@
 %{
   "bimap": {:hex, :bimap, "0.1.1", "f0406e59f65ba903af678383d2356d0a6e59fb794adc1a7dd32bd8fabe0f028f", [:mix], [], "hexpm"},
-  "bundlex": {:hex, :bundlex, "0.1.0", "fa28a7f5b5605f0c788b0e8ada69fa9aa6ab8d0fadf03a519f43f780e160e3cc", [:mix], [{:porcelain, "~> 2.0", [hex: :porcelain, repo: "hexpm", optional: false]}], "hexpm"},
+  "bundlex": {:hex, :bundlex, "0.1.2", "3ff76e4d69aab81a9a279c6c2dfdad77063ae118af9d7418f3b3c411be537610", [:mix], [{:porcelain, "~> 2.0", [hex: :porcelain, repo: "hexpm", optional: false]}], "hexpm"},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], []},
   "earmark": {:hex, :earmark, "1.2.5", "4d21980d5d2862a2e13ec3c49ad9ad783ffc7ca5769cf6ff891a4553fbaae761", [:mix], [], "hexpm"},
   "espec": {:hex, :espec, "1.5.1", "46c603c4adb4244b152ea53c4d5f4545ab1eb1de1556588ec908b8e4ba570188", [:mix], [{:meck, "0.8.9", [hex: :meck, repo: "hexpm", optional: false]}], "hexpm"},

@@ -7,7 +7,7 @@ defmodule Membrane.Element.Mad.Mixfile do
   def project do
     [
       app: :membrane_element_mad,
-      compilers: ~w(bundlex) ++ Mix.compilers(),
+      compilers: [:unifex, :bundlex] ++ Mix.compilers(),
       version: "0.1.0",
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -58,7 +58,9 @@ defmodule Membrane.Element.Mad.Mixfile do
       {:membrane_caps_audio_mpeg, "~> 0.1"},
       {:membrane_caps_audio_raw, "~> 0.1"},
       {:membrane_common_c, "~> 0.1"},
-      {:bundlex, "~> 0.1"},
+      # {:bundlex, "~> 0.1"},
+      {:bundlex, path: "../bundlex", override: true},
+      {:unifex, path: "../unifex"},
       {:espec, "~> 1.5.0", only: :test}
     ]
   end

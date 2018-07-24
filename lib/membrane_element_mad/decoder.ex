@@ -64,7 +64,7 @@ defmodule Membrane.Element.Mad.Decoder do
   # non empty buffer
   defp decode_buffer(native, buffer, previous_caps, acc) when byte_size(buffer) > 0 do
     with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
-           Native.decode_frame(native, buffer) do
+           Native.decode_frame(buffer, native) do
       new_caps = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
 
       new_acc =

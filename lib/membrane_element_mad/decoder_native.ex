@@ -9,7 +9,7 @@ defmodule Membrane.Element.Mad.Decoder.Native do
   No arugments are expected
   On success, should return {:ok, decoder_handle}
   """
-  @spec create() :: {:ok, any}
+  @spec create() :: {:ok, reference}
   defnif create()
 
   @doc """
@@ -25,7 +25,7 @@ defmodule Membrane.Element.Mad.Decoder.Native do
    - {:error, {:recoverable, reason, bytes_to_skip}}
    - {:error, {:malformed, reason}}
   """
-  @spec decode_frame(any, bitstring) ::
+  @spec decode_frame(bitstring, reference) ::
           {:ok, {bitstring, non_neg_integer, non_neg_integer, non_neg_integer}} | {:error, any}
-  defnif decode_frame(native, data)
+  defnif decode_frame(data, native)
 end
