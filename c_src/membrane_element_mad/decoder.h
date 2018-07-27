@@ -18,7 +18,6 @@ struct _DecoderState
 };
 
 #include "decoder_interface.h"
-#include "decoder_res.h"
 
 ERL_NIF_TERM create(ErlNifEnv* env);
 ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state);

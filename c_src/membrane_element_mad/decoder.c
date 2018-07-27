@@ -22,7 +22,7 @@ ERL_NIF_TERM create(ErlNifEnv* env) {
   mad_synth_init(state->mad_synth);
   mad_frame_init(state->mad_frame);
 
-  return create_result(env, state);
+  return create_ok_result(env, state);
 }
 
 /*
@@ -88,7 +88,7 @@ ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state) {
     }
   }
 
-  return decode_success_result(env, binary_term, bytes_used, mad_synth->pcm.samplerate, channels);
+  return decode_ok_result(env, binary_term, bytes_used, mad_synth->pcm.samplerate, channels);
 }
 
 void handle_destroy_state(ErlNifEnv* env, State* state) {
@@ -139,15 +139,17 @@ static ERL_NIF_TERM create_mad_stream_error(ErlNifEnv* env, struct mad_stream* m
 
   // no enough buffer to decode next frame
   if(mad_stream->error == MAD_ERROR_BUFLEN) {
-    return decode_buflen_failure_result(env);
+    return decode_error_buflen_result(env);
   }
 
   if(!MAD_RECOVERABLE(mad_stream->error)) {
-    return decode_malformed_failure_result(env, description);
+    MEMBRANE_WARN(env, "MAD recoverable error, reason: %s", description);
+    return decode_error_malformed_result(env);
   }
 
   //error is recoverable
   mad_stream->error = 0;
 
-  return decode_recoverable_failure_result(env, description, mad_stream->next_frame - mad_stream->buffer);
+  MEMBRANE_WARN(env, "MAD error, reason: %s", description);
+  return decode_error_recoverable_result(env, mad_stream->next_frame - mad_stream->buffer);
 }

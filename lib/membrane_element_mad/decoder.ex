@@ -84,8 +84,8 @@ defmodule Membrane.Element.Mad.Decoder do
       {:error, :buflen} ->
         {:ok, {buffer, Enum.reverse(acc), previous_caps}}
 
-      {:error, {:recoverable, reason, bytes_to_skip}} ->
-        warn_error("Skipping malformed frame (#{bytes_to_skip} bytes)", reason)
+      {:error, {:recoverable, bytes_to_skip}} ->
+        warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
@@ -98,9 +98,9 @@ defmodule Membrane.Element.Mad.Decoder do
             decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
         end
 
-      {:error, {:malformed, reason}} ->
-        warn_error("Terminating stream because of malformed frame", reason)
-        {:error, reason}
+      {:error, :malformed} ->
+        warn("Terminating stream because of malformed frame")
+        {:error, :malformed}
     end
   end
 end
