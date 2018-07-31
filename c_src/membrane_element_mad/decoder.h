@@ -17,7 +17,7 @@ struct _DecoderState
   struct mad_synth* mad_synth;
 };
 
-#include "decoder_interface.h"
+#include "_generated/decoder.h"
 
 ERL_NIF_TERM create(ErlNifEnv* env);
 ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state);

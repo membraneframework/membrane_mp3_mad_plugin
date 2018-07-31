@@ -11,7 +11,7 @@ defmodule Membrane.Element.Mad.BundlexProject do
     [
       decoder: [
         deps: [membrane_common_c: :membrane, unifex: :unifex],
-        sources: ["decoder_interface.c", "decoder.c"],
+        sources: ["_generated/decoder.c", "decoder.c"],
         pkg_configs: ["mad"]
       ]
     ]
