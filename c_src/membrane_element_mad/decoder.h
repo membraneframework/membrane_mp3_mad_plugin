@@ -19,7 +19,3 @@ struct _DecoderState
 };
 
 #include "_generated/decoder.h"
-
-UNIFEX_TERM create(UnifexEnv* env);
-UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload buffer, State* state);
-void handle_destroy_state(UnifexEnv* env, State* state);
