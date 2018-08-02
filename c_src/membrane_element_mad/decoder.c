@@ -4,15 +4,15 @@
 #define BYTES_PER_SAMPLE 3
 
 static int fixed_to_s24le(mad_fixed_t sample);
-static ERL_NIF_TERM create_mad_stream_error(ErlNifEnv* env, struct mad_stream* mad_stream);
+static UNIFEX_TERM create_mad_stream_error(UnifexEnv* env, struct mad_stream* mad_stream);
 
 /**
  * Initializes mad_stream, mad_frame, mad_synth and returns State resource
  * No arugments are expected
  * On success, should return {:ok, decoder_state}
  */
-ERL_NIF_TERM create(ErlNifEnv* env) {
-  State *state = enif_alloc_resource(STATE_RESOURCE_TYPE, sizeof(State));
+UNIFEX_TERM create(UnifexEnv* env) {
+  State *state = unifex_alloc_state(env);
 
   state->mad_stream = malloc(sizeof(struct mad_stream));
   state->mad_frame = malloc(sizeof(struct mad_frame));
@@ -39,7 +39,7 @@ ERL_NIF_TERM create(ErlNifEnv* env) {
  * - {:error, {:recoverable, reason, bytes_to_skip}}
  * - {:error, {:malformed, reason}}
  */
-ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state) {
+UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload in_payload, State* state) {
   size_t bytes_used;
 
   struct mad_synth *mad_synth;
@@ -50,7 +50,7 @@ ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state) {
   mad_stream = state->mad_stream;
   mad_frame = state->mad_frame;
 
-  mad_stream_buffer(mad_stream, buffer.data, buffer.size);
+  mad_stream_buffer(mad_stream, in_payload.data, in_payload.size);
 
   if(mad_frame_decode(mad_frame, mad_stream)) {
     return create_mad_stream_error(env, mad_stream);
@@ -59,7 +59,7 @@ ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state) {
   mad_synth_frame(mad_synth, mad_frame);
 
   if(!mad_stream->next_frame){
-    bytes_used = buffer.size;
+    bytes_used = in_payload.size;
   }
   else {
     bytes_used = mad_stream->next_frame - mad_stream->buffer;
@@ -69,9 +69,8 @@ ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state) {
   int channels = MAD_NCHANNELS(&(mad_frame->header));
   size_t decoded_frame_size = channels * mad_synth->pcm.length * BYTES_PER_SAMPLE;
 
-  ERL_NIF_TERM binary_term;
-  unsigned char *data_ptr;
-  data_ptr = enif_make_new_binary(env, decoded_frame_size, &binary_term);
+  UnifexPayload out_payload = unifex_payload_alloc(env, decoded_frame_size);
+  unsigned char* data_ptr = out_payload.data;
 
 
   for (int i=0; i<mad_synth->pcm.length; i++) {
@@ -88,10 +87,10 @@ ERL_NIF_TERM decode_frame(ErlNifEnv* env, ErlNifBinary buffer, State* state) {
     }
   }
 
-  return decode_frame_result_ok(env, binary_term, bytes_used, mad_synth->pcm.samplerate, channels);
+  return decode_frame_result_ok(env, out_payload, bytes_used, mad_synth->pcm.samplerate, channels);
 }
 
-void handle_destroy_state(ErlNifEnv* env, State* state) {
+void handle_destroy_state(UnifexEnv* env, State* state) {
   if(state) {
     if(state->mad_stream){
       mad_stream_finish(state->mad_stream);
@@ -134,7 +133,7 @@ static int fixed_to_s24le(mad_fixed_t sample) {
 }
 
 
-static ERL_NIF_TERM create_mad_stream_error(ErlNifEnv* env, struct mad_stream* mad_stream) {
+static UNIFEX_TERM create_mad_stream_error(UnifexEnv* env, struct mad_stream* mad_stream) {
   const char *description = mad_stream_errorstr(mad_stream);
 
   // no enough buffer to decode next frame

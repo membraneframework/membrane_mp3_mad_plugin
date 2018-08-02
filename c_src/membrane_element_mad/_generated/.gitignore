@@ -1,2 +1,2 @@
-decoder.c
-decoder.h
+*.c
+*.h
