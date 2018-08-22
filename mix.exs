@@ -54,14 +54,18 @@ defmodule Membrane.Element.Mad.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.1"},
+      # {:membrane_core, "~> 0.1"},
+      {:membrane_core,
+       git: "https://github.com/membraneframework/membrane-core.git", override: true},
       {:membrane_caps_audio_mpeg, "~> 0.1"},
       {:membrane_caps_audio_raw, "~> 0.1"},
       # {:membrane_common_c, "~> 0.1"},
       {:membrane_common_c,
-       git: "git@github.com:membraneframework/membrane-common-c.git", branch: "feature/unifex"},
+       git: "https://github.com/membraneframework/membrane-common-c.git",
+       branch: "feature/shm-payload"},
       {:bundlex, "~> 0.1"},
-      {:unifex, git: "git@github.com:membraneframework/unifex.git", branch: "develop"},
+      {:unifex,
+       git: "git@github.com:membraneframework/unifex.git", branch: "feature/shm-integration"},
       {:espec, "~> 1.5.0", only: :test}
     ]
   end

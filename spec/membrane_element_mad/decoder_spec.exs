@@ -29,11 +29,11 @@ defmodule Membrane.Element.Mad.DecoderSpec do
     end
   end
 
-  describe ".handle_prepare/1" do
+  describe ".handle_prepare/3" do
     let :state, do: %{queue: <<>>, native: nil, source_caps: nil}
 
     it "should return ok result" do
-      expect(described_module().handle_prepare(:stopped, state())) |> to(be_ok_result())
+      expect(described_module().handle_prepare(:stopped, %{}, state())) |> to(be_ok_result())
     end
   end
 

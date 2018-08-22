@@ -6,7 +6,7 @@ defmodule Membrane.Element.Mad.Decoder do
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias __MODULE__.Native
   alias Membrane.Buffer
-  use Membrane.Mixins.Log
+  use Membrane.Log
 
   def_known_source_pads source: {:always, :pull, {Raw, format: :s24le}}
 
@@ -18,7 +18,7 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
   @impl true
-  def handle_prepare(:stopped, state) do
+  def handle_prepare(:stopped, _, state) do
     with {:ok, native} <- Native.create() do
       {:ok, %{state | native: native}}
     else
@@ -26,7 +26,7 @@ defmodule Membrane.Element.Mad.Decoder do
     end
   end
 
-  def handle_prepare(_, state), do: {:ok, state}
+  def handle_prepare(_, _, state), do: {:ok, state}
 
   @impl true
   def handle_demand(:source, size, :buffers, _, state) do
