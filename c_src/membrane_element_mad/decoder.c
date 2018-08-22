@@ -39,7 +39,8 @@ UNIFEX_TERM create(UnifexEnv* env) {
  * - {:error, {:recoverable, reason, bytes_to_skip}}
  * - {:error, {:malformed, reason}}
  */
-UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload in_payload, State* state) {
+UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* state) {
+  UNIFEX_TERM result;
   size_t bytes_used;
 
   struct mad_synth *mad_synth;
@@ -50,7 +51,7 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload in_payload, State* state)
   mad_stream = state->mad_stream;
   mad_frame = state->mad_frame;
 
-  mad_stream_buffer(mad_stream, in_payload.data, in_payload.size);
+  mad_stream_buffer(mad_stream, in_payload->data, in_payload->size);
 
   if(mad_frame_decode(mad_frame, mad_stream)) {
     return create_mad_stream_error(env, mad_stream);
@@ -59,7 +60,7 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload in_payload, State* state)
   mad_synth_frame(mad_synth, mad_frame);
 
   if(!mad_stream->next_frame){
-    bytes_used = in_payload.size;
+    bytes_used = in_payload->size;
   }
   else {
     bytes_used = mad_stream->next_frame - mad_stream->buffer;
@@ -69,8 +70,8 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload in_payload, State* state)
   int channels = MAD_NCHANNELS(&(mad_frame->header));
   size_t decoded_frame_size = channels * mad_synth->pcm.length * BYTES_PER_SAMPLE;
 
-  UnifexPayload out_payload = unifex_payload_alloc(env, decoded_frame_size);
-  unsigned char* data_ptr = out_payload.data;
+  UnifexPayload * out_payload = unifex_payload_alloc(env, in_payload->type, decoded_frame_size);
+  unsigned char* data_ptr = out_payload->data;
 
 
   for (int i=0; i<mad_synth->pcm.length; i++) {
@@ -87,7 +88,9 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload in_payload, State* state)
     }
   }
 
-  return decode_frame_result_ok(env, out_payload, bytes_used, mad_synth->pcm.samplerate, channels);
+  result = decode_frame_result_ok(env, out_payload, bytes_used, mad_synth->pcm.samplerate, channels);
+  unifex_payload_free_ptr(&out_payload);
+  return result;
 }
 
 void handle_destroy_state(UnifexEnv* env, State* state) {
