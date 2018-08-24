@@ -31,15 +31,16 @@ UNIFEX_TERM create(UnifexEnv* env) {
  * Expects arguments:
  * - native resource
  * - buffer to decode
+ * - offset in bytes indicating frame position in buffer
  *
  * Returns one of:
  * - tuple {:ok, {decoded_audio, bytes_used, sample_rate, channels}}
- *    decoded_audio is a bitstring with interleaved channels
+ *    decoded_audio is a payload with interleaved channels
  * - {:error, :buflen} - when input buffer is too small
  * - {:error, {:recoverable, reason, bytes_to_skip}}
  * - {:error, {:malformed, reason}}
  */
-UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* state) {
+UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, int offset, State* state) {
   UNIFEX_TERM result;
   size_t bytes_used;
 
@@ -51,7 +52,9 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* stat
   mad_stream = state->mad_stream;
   mad_frame = state->mad_frame;
 
-  mad_stream_buffer(mad_stream, in_payload->data, in_payload->size);
+  void * buffer_start = in_payload->data + offset;
+  size_t buffer_size = in_payload->size - offset;
+  mad_stream_buffer(mad_stream, buffer_start, buffer_size);
 
   if(mad_frame_decode(mad_frame, mad_stream)) {
     return create_mad_stream_error(env, mad_stream);
@@ -60,7 +63,7 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* stat
   mad_synth_frame(mad_synth, mad_frame);
 
   if(!mad_stream->next_frame){
-    bytes_used = in_payload->size;
+    bytes_used = buffer_size;
   }
   else {
     bytes_used = mad_stream->next_frame - mad_stream->buffer;

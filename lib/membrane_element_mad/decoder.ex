@@ -5,7 +5,7 @@ defmodule Membrane.Element.Mad.Decoder do
   use Membrane.Element.Base.Filter
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias __MODULE__.Native
-  alias Membrane.Buffer
+  alias Membrane.{Buffer, Payload}
   use Membrane.Log
 
   def_known_source_pads source: {:always, :pull, {Raw, format: :s24le}}
@@ -39,8 +39,8 @@ defmodule Membrane.Element.Mad.Decoder do
 
   @impl true
   def handle_process1(:sink, buffer, _, state) do
-    to_decode = state.queue <> buffer.payload
-    debug(inspect({:handle_process, length: byte_size(to_decode)}))
+    to_decode = Payload.concat(state.queue, buffer.payload)
+    debug(inspect({:handle_process, length: Payload.size(to_decode)}))
 
     case decode_buffer(state.native, state.source_caps, to_decode) do
       {:ok, {new_queue, commands, new_caps}} ->
@@ -53,54 +53,55 @@ defmodule Membrane.Element.Mad.Decoder do
 
   # first call
   defp decode_buffer(native, previous_caps, buffer) do
-    decode_buffer(native, buffer, previous_caps, [])
+    decode_buffer(native, buffer, 0, previous_caps, [])
   end
 
   # empty buffer
-  defp decode_buffer(_native, <<>>, previous_caps, acc) do
-    {:ok, {<<>>, Enum.reverse(acc), previous_caps}}
-  end
-
-  # non empty buffer
-  defp decode_buffer(native, buffer, previous_caps, acc) when byte_size(buffer) > 0 do
-    with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
-           Native.decode_frame(buffer, native) do
-      new_caps = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
-
-      new_acc =
-        case new_caps do
-          ^previous_caps ->
-            acc
-
-          _ ->
-            [{:caps, {:source, new_caps}} | acc]
-        end
-
-      new_acc = [{:buffer, {:source, %Buffer{payload: decoded_frame}}} | new_acc]
-
-      <<_used::binary-size(frame_size), rest::binary>> = buffer
-      decode_buffer(native, rest, new_caps, new_acc)
+  defp decode_buffer(native, payload, offset, previous_caps, acc) do
+    if Payload.size(payload) == offset do
+      empty = payload |> Payload.type() |> Payload.empty_of_type()
+      {:ok, {empty, Enum.reverse(acc), previous_caps}}
     else
-      {:error, :buflen} ->
-        {:ok, {buffer, Enum.reverse(acc), previous_caps}}
+      with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
+             Native.decode_frame(payload, offset, native) do
+        new_caps = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
 
-      {:error, {:recoverable, bytes_to_skip}} ->
-        warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
-        <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
+        new_acc =
+          case new_caps do
+            ^previous_caps ->
+              acc
 
-        case acc do
-          [{:event, _} | _] ->
-            # send only one discontinuity event in a row
-            decode_buffer(native, new_buffer, previous_caps, acc)
+            _ ->
+              [{:caps, {:source, new_caps}} | acc]
+          end
 
-          _ ->
-            discontinuity = {:event, {:source, Membrane.Event.discontinuity(nil)}}
-            decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
-        end
+        new_acc = [{:buffer, {:source, %Buffer{payload: decoded_frame}}} | new_acc]
 
-      {:error, :malformed} ->
-        warn("Terminating stream because of malformed frame")
-        {:error, :malformed}
+        decode_buffer(native, payload, offset + frame_size, new_caps, new_acc)
+      else
+        {:error, :buflen} ->
+          partial_frame = Payload.drop(payload, offset)
+          {:ok, {partial_frame, Enum.reverse(acc), previous_caps}}
+
+        {:error, {:recoverable, bytes_to_skip}} ->
+          warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
+
+          new_offset = offset + bytes_to_skip
+
+          case acc do
+            [{:event, _} | _] ->
+              # send only one discontinuity event in a row
+              decode_buffer(native, payload, new_offset, previous_caps, acc)
+
+            _ ->
+              discontinuity = {:event, {:source, Membrane.Event.discontinuity(nil)}}
+              decode_buffer(native, payload, new_offset, previous_caps, [discontinuity | acc])
+          end
+
+        {:error, :malformed} ->
+          warn("Terminating stream because of malformed frame")
+          {:error, :malformed}
+      end
     end
   end
 end
