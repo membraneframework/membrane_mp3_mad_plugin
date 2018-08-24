@@ -14,7 +14,7 @@ defmodule Membrane.Element.Mad.Decoder do
 
   @impl true
   def handle_init(_) do
-    {:ok, %{queue: <<>>, native: nil, source_caps: nil}}
+    {:ok, %{queue: nil, native: nil, source_caps: nil}}
   end
 
   @impl true
@@ -38,6 +38,11 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
   @impl true
+  def handle_process1(:sink, buffer, ctx, %{queue: nil} = state) do
+    queue = buffer.payload |> Payload.type() |> Payload.empty_of_type()
+    handle_process1(:sink, buffer, ctx, %{state | queue: queue})
+  end
+
   def handle_process1(:sink, buffer, _, state) do
     to_decode = Payload.concat(state.queue, buffer.payload)
     debug(inspect({:handle_process, length: Payload.size(to_decode)}))
