@@ -44,7 +44,13 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
   def handle_process1(:sink, buffer, _, state) do
-    to_decode = Payload.concat(state.queue, buffer.payload)
+    to_decode =
+      if Payload.size(state.queue) == 0 do
+        buffer.payload
+      else
+        Payload.concat(state.queue, buffer.payload)
+      end
+
     debug(inspect({:handle_process, length: Payload.size(to_decode)}))
 
     case decode_buffer(state.native, state.source_caps, to_decode) do
