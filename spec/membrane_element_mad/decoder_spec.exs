@@ -18,14 +18,9 @@ defmodule Membrane.Element.Mad.DecoderSpec do
       expect(described_module().handle_init(options())) |> to(be_ok_result())
     end
 
-    it "should return queue as a bitstring" do
+    it "should set queue to nil" do
       {:ok, %{queue: queue}} = described_module().handle_init(options())
-      expect(queue) |> to(be_bitstring())
-    end
-
-    it "should return empty queue" do
-      {:ok, %{queue: queue}} = described_module().handle_init(options())
-      expect(queue) |> to(be_empty())
+      expect(queue) |> to(be_nil())
     end
   end
 
