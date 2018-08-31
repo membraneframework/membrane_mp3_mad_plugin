@@ -60,12 +60,9 @@ defmodule Membrane.Element.Mad.Mixfile do
       {:membrane_caps_audio_mpeg, "~> 0.1"},
       {:membrane_caps_audio_raw, "~> 0.1"},
       # {:membrane_common_c, "~> 0.1"},
-      {:membrane_common_c,
-       git: "https://github.com/membraneframework/membrane-common-c.git",
-       branch: "feature/shm-payload"},
+      {:membrane_common_c, git: "https://github.com/membraneframework/membrane-common-c.git"},
       {:bundlex, "~> 0.1"},
-      {:unifex,
-       git: "git@github.com:membraneframework/unifex.git", branch: "feature/shm-integration"},
+      {:unifex, git: "https://github.com/membraneframework/unifex"},
       {:espec, "~> 1.5.0", only: :test}
     ]
   end

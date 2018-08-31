@@ -89,7 +89,7 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* stat
   }
 
   result = decode_frame_result_ok(env, out_payload, bytes_used, mad_synth->pcm.samplerate, channels);
-  unifex_payload_free_ptr(&out_payload);
+  unifex_payload_release_ptr(&out_payload);
   return result;
 }
 
