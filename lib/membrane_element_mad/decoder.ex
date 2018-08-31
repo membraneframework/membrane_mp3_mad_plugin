@@ -39,7 +39,7 @@ defmodule Membrane.Element.Mad.Decoder do
 
   @impl true
   def handle_process1(:sink, buffer, ctx, %{queue: nil} = state) do
-    queue = buffer.payload |> Payload.type() |> Payload.empty_of_type()
+    queue = Payload.module(buffer.payload).empty()
     handle_process1(:sink, buffer, ctx, %{state | queue: queue})
   end
 
@@ -70,7 +70,7 @@ defmodule Membrane.Element.Mad.Decoder do
   # empty buffer
   defp decode_buffer(native, payload, offset, previous_caps, acc) do
     if Payload.size(payload) == offset do
-      empty = payload |> Payload.type() |> Payload.empty_of_type()
+      empty = Payload.module(payload).empty()
       {:ok, {empty, Enum.reverse(acc), previous_caps}}
     else
       with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
