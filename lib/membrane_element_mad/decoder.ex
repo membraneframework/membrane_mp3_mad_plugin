@@ -18,7 +18,7 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
   @impl true
-  def handle_prepare(:stopped, _, state) do
+  def handle_prepare(:stopped, _ctx, state) do
     with {:ok, native} <- Native.create() do
       {:ok, %{state | native: native}}
     else
@@ -26,19 +26,19 @@ defmodule Membrane.Element.Mad.Decoder do
     end
   end
 
-  def handle_prepare(_, _, state), do: {:ok, state}
+  def handle_prepare(_, _ctx, state), do: {:ok, state}
 
   @impl true
-  def handle_demand(:source, size, :buffers, _, state) do
+  def handle_demand(:source, size, :buffers, _ctx, state) do
     {{:ok, demand: {:sink, size}}, state}
   end
 
-  def handle_demand(:source, _size, :bytes, _, state) do
+  def handle_demand(:source, _size, :bytes, _ctx, state) do
     {{:ok, demand: :sink}, state}
   end
 
   @impl true
-  def handle_process1(:sink, buffer, _, state) do
+  def handle_process1(:sink, buffer, _ctx, state) do
     to_decode = state.queue <> buffer.payload
     debug(inspect({:handle_process, length: byte_size(to_decode)}))
 
