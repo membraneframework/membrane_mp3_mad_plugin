@@ -58,9 +58,9 @@ defmodule Membrane.Element.Mad.Mixfile do
       {:membrane_core,
        git: "https://github.com/membraneframework/membrane-core.git", override: true},
       {:membrane_caps_audio_mpeg, "~> 0.1"},
-      {:membrane_caps_audio_raw, "~> 0.1"},
+      {:membrane_caps_audio_raw, "~> 0.1", github: "membraneframework/membrane-caps-audio-raw"},
       # {:membrane_common_c, "~> 0.1"},
-      {:membrane_common_c, git: "https://github.com/membraneframework/membrane-common-c.git"},
+      {:membrane_common_c, github: "membraneframework/membrane-common-c"},
       {:bundlex, "~> 0.1"},
       {:unifex, git: "https://github.com/membraneframework/unifex"},
       {:espec, "~> 1.5.0", only: :test}
