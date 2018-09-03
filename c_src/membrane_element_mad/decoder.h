@@ -1,10 +1,5 @@
-/**
- * Membrane Element: MP3 decoder - Erlang native interface for libmad-based decoder
- */
-#ifndef __DECODER_H__
-#define __DECODER_H__
+#pragma once
 
-#include <stdio.h>
 #include <erl_nif.h>
 #include <membrane/membrane.h>
 #define MEMBRANE_LOG_TAG "Membrane.Element.Mad.DecoderNative"
@@ -12,14 +7,15 @@
 #include <limits.h>
 #include <string.h>
 #include <mad.h>
+#include <unifex/unifex.h>
 
-typedef struct _DecoderHandle DecoderHandle;
+typedef struct _DecoderState State;
 
-struct _DecoderHandle
+struct _DecoderState
 {
   struct mad_stream* mad_stream;
   struct mad_frame* mad_frame;
   struct mad_synth* mad_synth;
 };
 
-#endif
+#include "_generated/decoder.h"

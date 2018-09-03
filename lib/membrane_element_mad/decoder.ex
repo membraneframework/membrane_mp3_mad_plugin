@@ -6,7 +6,7 @@ defmodule Membrane.Element.Mad.Decoder do
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias __MODULE__.Native
   alias Membrane.Buffer
-  use Membrane.Mixins.Log
+  use Membrane.Log
 
   def_known_source_pads source: {:always, :pull, {Raw, format: :s24le}}
 
@@ -18,7 +18,7 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
   @impl true
-  def handle_prepare(:stopped, state) do
+  def handle_prepare(:stopped, _ctx, state) do
     with {:ok, native} <- Native.create() do
       {:ok, %{state | native: native}}
     else
@@ -26,19 +26,19 @@ defmodule Membrane.Element.Mad.Decoder do
     end
   end
 
-  def handle_prepare(_, state), do: {:ok, state}
+  def handle_prepare(_, _ctx, state), do: {:ok, state}
 
   @impl true
-  def handle_demand(:source, size, :buffers, _, state) do
+  def handle_demand(:source, size, :buffers, _ctx, state) do
     {{:ok, demand: {:sink, size}}, state}
   end
 
-  def handle_demand(:source, _size, :bytes, _, state) do
+  def handle_demand(:source, _size, :bytes, _ctx, state) do
     {{:ok, demand: :sink}, state}
   end
 
   @impl true
-  def handle_process1(:sink, buffer, _, state) do
+  def handle_process1(:sink, buffer, _ctx, state) do
     to_decode = state.queue <> buffer.payload
     debug(inspect({:handle_process, length: byte_size(to_decode)}))
 
@@ -64,7 +64,7 @@ defmodule Membrane.Element.Mad.Decoder do
   # non empty buffer
   defp decode_buffer(native, buffer, previous_caps, acc) when byte_size(buffer) > 0 do
     with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
-           Native.decode_frame(native, buffer) do
+           Native.decode_frame(buffer, native) do
       new_caps = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
 
       new_acc =
@@ -84,8 +84,8 @@ defmodule Membrane.Element.Mad.Decoder do
       {:error, :buflen} ->
         {:ok, {buffer, Enum.reverse(acc), previous_caps}}
 
-      {:error, {:recoverable, reason, bytes_to_skip}} ->
-        warn_error("Skipping malformed frame (#{bytes_to_skip} bytes)", reason)
+      {:error, {:recoverable, bytes_to_skip}} ->
+        warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
@@ -98,9 +98,9 @@ defmodule Membrane.Element.Mad.Decoder do
             decode_buffer(native, new_buffer, previous_caps, [discontinuity | acc])
         end
 
-      {:error, {:malformed, reason}} ->
-        warn_error("Terminating stream because of malformed frame", reason)
-        {:error, reason}
+      {:error, :malformed} ->
+        warn("Terminating stream because of malformed frame")
+        {:error, :malformed}
     end
   end
 end

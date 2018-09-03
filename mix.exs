@@ -2,13 +2,14 @@ defmodule Membrane.Element.Mad.Mixfile do
   use Mix.Project
   Application.put_env(:bundlex, :membrane_element_mad, __ENV__)
 
+  @version "0.1.1"
   @github_url "https://github.com/membraneframework/membrane-element-mad"
 
   def project do
     [
       app: :membrane_element_mad,
-      compilers: ~w(bundlex) ++ Mix.compilers(),
-      version: "0.1.0",
+      compilers: [:unifex, :bundlex] ++ Mix.compilers(),
+      version: @version,
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       description: "Membrane Multimedia Framework (Mad Element)",
@@ -35,7 +36,8 @@ defmodule Membrane.Element.Mad.Mixfile do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md"]
+      extras: ["README.md"],
+      source_ref: "v#{@version}"
     ]
   end
 
@@ -53,12 +55,13 @@ defmodule Membrane.Element.Mad.Mixfile do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.1"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:membrane_core, "~> 0.1", github: "membraneframework/membrane-core", override: true},
       {:membrane_caps_audio_mpeg, "~> 0.1"},
-      {:membrane_caps_audio_raw, "~> 0.1"},
-      {:membrane_common_c, "~> 0.1"},
+      {:membrane_caps_audio_raw, "~> 0.1.2"},
+      {:membrane_common_c, "~> 0.1", github: "membraneframework/membrane-common-c"},
       {:bundlex, "~> 0.1"},
+      {:unifex, "~> 0.1", github: "membraneframework/unifex"},
       {:espec, "~> 1.5.0", only: :test}
     ]
   end
