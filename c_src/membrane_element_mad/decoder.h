@@ -9,7 +9,8 @@
 #include <mad.h>
 #include <unifex/unifex.h>
 
-typedef struct _DecoderState State;
+typedef struct _DecoderState UnifexNifState;
+typedef UnifexNifState State;
 
 struct _DecoderState
 {

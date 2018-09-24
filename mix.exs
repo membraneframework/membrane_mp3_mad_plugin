@@ -62,7 +62,8 @@ defmodule Membrane.Element.Mad.Mixfile do
       # {:membrane_common_c, "~> 0.1"},
       {:membrane_common_c, git: "https://github.com/membraneframework/membrane-common-c.git"},
       {:bundlex, "~> 0.1"},
-      {:unifex, git: "https://github.com/membraneframework/unifex"},
+      # {:unifex, git: "https://github.com/membraneframework/unifex"},
+      {:unifex, path: "../../unifex"},
       {:espec, "~> 1.5.0", only: :test}
     ]
   end
