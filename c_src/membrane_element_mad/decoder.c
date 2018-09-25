@@ -22,7 +22,9 @@ UNIFEX_TERM create(UnifexEnv* env) {
   mad_synth_init(state->mad_synth);
   mad_frame_init(state->mad_frame);
 
-  return create_result_ok(env, state);
+  UNIFEX_TERM res = create_result_ok(env, state);
+  unifex_release_state(env, state);
+  return res;
 }
 
 /*
