@@ -14,9 +14,9 @@ static UNIFEX_TERM create_mad_stream_error(UnifexEnv* env, struct mad_stream* ma
 UNIFEX_TERM create(UnifexEnv* env) {
   State *state = unifex_alloc_state(env);
 
-  state->mad_stream = malloc(sizeof(struct mad_stream));
-  state->mad_frame = malloc(sizeof(struct mad_frame));
-  state->mad_synth = malloc(sizeof(struct mad_synth));
+  state->mad_stream = unifex_alloc(sizeof(struct mad_stream));
+  state->mad_frame = unifex_alloc(sizeof(struct mad_frame));
+  state->mad_synth = unifex_alloc(sizeof(struct mad_synth));
 
   mad_stream_init(state->mad_stream);
   mad_synth_init(state->mad_synth);
@@ -99,15 +99,15 @@ void handle_destroy_state(UnifexEnv* env, State* state) {
   if(state) {
     if(state->mad_stream){
       mad_stream_finish(state->mad_stream);
-      free(state->mad_stream);
+      unifex_free(state->mad_stream);
     }
     if(state->mad_frame){
       mad_frame_finish(state->mad_frame);
-      free(state->mad_frame);
+      unifex_free(state->mad_frame);
     }
     if(state->mad_synth){
       mad_synth_finish(state->mad_synth);
-      free(state->mad_synth);
+      unifex_free(state->mad_synth);
     }
   } else {
     MEMBRANE_WARN(env, "MAD: Decoder state already released");
