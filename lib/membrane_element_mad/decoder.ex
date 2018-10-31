@@ -38,7 +38,6 @@ defmodule Membrane.Element.Mad.Decoder do
   @impl true
   def handle_process(:input, buffer, ctx, state) do
     to_decode = state.queue <> buffer.payload
-    debug(inspect({:handle_process, length: byte_size(to_decode)}))
 
     case decode_buffer(state.native, to_decode, ctx.pads.output.caps) do
       {:ok, {new_queue, actions}} ->
@@ -64,7 +63,7 @@ defmodule Membrane.Element.Mad.Decoder do
       buffer_action = [buffer: {:output, %Buffer{payload: decoded_frame}}]
 
       <<_used::binary-size(frame_size), rest::binary>> = buffer
-      decode_buffer(native, rest, new_caps, caps_action ++ buffer_action ++ acc)
+      decode_buffer(native, rest, new_caps, buffer_action ++ caps_action ++ acc)
     else
       {:error, :buflen} ->
         {:ok, {buffer, Enum.reverse(acc)}}
