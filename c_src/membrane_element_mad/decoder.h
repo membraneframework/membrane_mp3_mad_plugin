@@ -1,6 +1,5 @@
 #pragma once
 
-#include <erl_nif.h>
 #include <membrane/membrane.h>
 #define MEMBRANE_LOG_TAG "Membrane.Element.Mad.DecoderNative"
 #include <membrane/log.h>
