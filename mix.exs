@@ -2,7 +2,7 @@ defmodule Membrane.Element.Mad.Mixfile do
   use Mix.Project
   Application.put_env(:bundlex, :membrane_element_mad, __ENV__)
 
-  @version "0.1.1"
+  @version "0.2.0"
   @github_url "https://github.com/membraneframework/membrane-element-mad"
 
   def project do
