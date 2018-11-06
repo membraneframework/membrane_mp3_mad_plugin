@@ -36,6 +36,11 @@ defmodule Membrane.Element.Mad.Decoder do
   end
 
   @impl true
+  def handle_caps(:input, _caps, _ctx, state) do
+    {:ok, state}
+  end
+
+  @impl true
   def handle_process(:input, buffer, ctx, state) do
     to_decode = state.queue <> buffer.payload
 
