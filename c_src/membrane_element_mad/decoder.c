@@ -96,21 +96,18 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* stat
 }
 
 void handle_destroy_state(UnifexEnv* env, State* state) {
-  if(state) {
-    if(state->mad_stream){
-      mad_stream_finish(state->mad_stream);
-      unifex_free(state->mad_stream);
-    }
-    if(state->mad_frame){
-      mad_frame_finish(state->mad_frame);
-      unifex_free(state->mad_frame);
-    }
-    if(state->mad_synth){
-      mad_synth_finish(state->mad_synth);
-      unifex_free(state->mad_synth);
-    }
-  } else {
-    MEMBRANE_WARN(env, "MAD: Decoder state already released");
+  UNIFEX_UNUSED(env);
+  if(state->mad_stream){
+    mad_stream_finish(state->mad_stream);
+    unifex_free(state->mad_stream);
+  }
+  if(state->mad_frame){
+    mad_frame_finish(state->mad_frame);
+    unifex_free(state->mad_frame);
+  }
+  if(state->mad_synth){
+    mad_synth_finish(state->mad_synth);
+    unifex_free(state->mad_synth);
   }
 }
 
