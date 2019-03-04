@@ -56,14 +56,13 @@ defmodule Membrane.Element.Mad.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.2"},
-      {:bunch, "~> 0.1.2"},
+      {:membrane_core, "~> 0.2.2"},
       {:membrane_caps_audio_mpeg, "~> 0.1"},
       {:membrane_caps_audio_raw, "~> 0.1.2"},
       {:membrane_common_c, "~> 0.2"},
       {:bundlex, "~> 0.1"},
       {:unifex, "~> 0.1"},
-      {:espec, "~> 1.5.0", only: :test}
+      {:espec, "~> 1.7", only: :test}
     ]
   end
 end
