@@ -8,9 +8,9 @@ defmodule Membrane.Element.Mad.Decoder do
   alias Membrane.Buffer
   use Membrane.Log
 
-  def_input_pads input: [demand_unit: :buffers, caps: [:any, MPEG]]
+  def_input_pad :input, demand_unit: :buffers, caps: [:any, MPEG]
 
-  def_output_pads output: [caps: {Raw, format: :s24le}]
+  def_output_pad :output, caps: {Raw, format: :s24le}
 
   @impl true
   def handle_init(_) do
