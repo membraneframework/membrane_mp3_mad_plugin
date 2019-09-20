@@ -2,7 +2,7 @@ defmodule Membrane.Element.Mad.Decoder do
   @moduledoc """
   Decodes MPEG audio to raw data in S24LE format
   """
-  use Membrane.Element.Base.Filter
+  use Membrane.Filter
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias __MODULE__.Native
   alias Membrane.Buffer
