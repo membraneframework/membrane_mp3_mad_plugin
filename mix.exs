@@ -1,7 +1,7 @@
 defmodule Membrane.Element.Mad.Mixfile do
   use Mix.Project
 
-  @version "0.2.4"
+  @version "0.3.0"
   @github_url "https://github.com/membraneframework/membrane-element-mad"
 
   def project do
@@ -55,10 +55,10 @@ defmodule Membrane.Element.Mad.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.4.0"},
+      {:membrane_core, "~> 0.5.0"},
       {:membrane_caps_audio_mpeg, "~> 0.2.0"},
-      {:membrane_caps_audio_raw, "~> 0.1.0"},
-      {:membrane_common_c, "~> 0.2.0"},
+      {:membrane_caps_audio_raw, "~> 0.2.0"},
+      {:membrane_common_c, "~> 0.3.0"},
       {:bundlex, "~> 0.2.0"},
       {:unifex, "~> 0.2.0"},
       {:espec, "~> 1.7", only: :test}

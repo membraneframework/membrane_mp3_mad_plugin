@@ -13,7 +13,7 @@ Documentation is available at [HexDocs](https://hexdocs.pm/membrane_element_mad/
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_element_mad, "~> 0.2"}
+{:membrane_element_mad, "~> 0.3"}
 ```
 
 You also need to have [MAD](https://www.underbit.com/products/mad/) installed.
