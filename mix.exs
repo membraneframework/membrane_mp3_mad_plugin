@@ -1,19 +1,19 @@
-defmodule Membrane.Element.Mad.Mixfile do
+defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   use Mix.Project
 
   @version "0.3.0"
-  @github_url "https://github.com/membraneframework/membrane-element-mad"
+  @github_url "https://github.com/membraneframework/membrane_mp3_mad_plugin"
 
   def project do
     [
-      app: :membrane_element_mad,
+      app: :membrane_mp3_mad_plugin,
       compilers: [:unifex, :bundlex] ++ Mix.compilers(),
       version: @version,
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
-      description: "Membrane Multimedia Framework (Mad Element)",
+      description: "Membrane MP3 decoder based on MAD",
       package: package(),
-      name: "Membrane Element: Mad",
+      name: "Membrane MP3 MAD plugin",
       source_url: @github_url,
       docs: docs(),
       homepage_url: "https://membraneframework.org",
@@ -24,8 +24,7 @@ defmodule Membrane.Element.Mad.Mixfile do
 
   def application do
     [
-      extra_applications: [],
-      mod: {Membrane.Element.Mad, []}
+      extra_applications: []
     ]
   end
 

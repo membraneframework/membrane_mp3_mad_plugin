@@ -1,4 +1,4 @@
-module Membrane.Element.Mad.Decoder.Native
+module Membrane.MP3.MAD.Decoder.Native
 
 spec create() :: {:ok :: label, state}
 

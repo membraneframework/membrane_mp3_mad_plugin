@@ -1,4 +1,4 @@
-defmodule Membrane.Element.Mad.BundlexProject do
+defmodule Membrane.MP3.MAD.BundlexProject do
   use Bundlex.Project
 
   def project() do
