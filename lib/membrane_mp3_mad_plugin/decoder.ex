@@ -1,4 +1,4 @@
-defmodule Membrane.Element.Mad.Decoder do
+defmodule Membrane.MP3.MAD.Decoder do
   @moduledoc """
   Decodes MPEG audio to raw data in S24LE format
   """

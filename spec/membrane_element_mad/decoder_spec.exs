@@ -1,6 +1,6 @@
-defmodule Membrane.Element.Mad.DecoderSpec do
+defmodule Membrane.MP3.MAD.DecoderSpec do
   use ESpec, asyn: true
-  alias Membrane.Element.Mad.Decoder.Native
+  alias Membrane.MP3.MAD.Decoder.Native
   require Membrane.Caps.Audio.MPEG
 
   @minimal_mpeg_frame <<255, 243, 20, 196, 0, 0, 0, 3, 72, 0, 0, 0, 0, 76, 65, 77, 69, 51, 46, 57,

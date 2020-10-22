@@ -1,11 +1,12 @@
-# Membrane Multimedia Framework: Mad Element
+# Membrane MP3 MAD plugin
 
-[![CircleCI](https://circleci.com/gh/membraneframework/membrane-element-mad.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane-element-mad)
+[![CircleCI](https://circleci.com/gh/membraneframework/membrane_mp3_mad_plugin.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane_mp3_mad_plugin)
 
-This package provides [Membrane Multimedia Framework](https://membraneframework.org)
-elements that can be used to decode MPEG audio using MAD library.
+MP3 decoder based on MAD.
 
-Documentation is available at [HexDocs](https://hexdocs.pm/membrane_element_mad/)
+This package is a part of [Membrane Multimedia Framework](https://membraneframework.org).
+
+Documentation is available at [HexDocs](https://hexdocs.pm/membrane_mp3_mad_plugin/)
 
 
 ## Installation
@@ -13,7 +14,7 @@ Documentation is available at [HexDocs](https://hexdocs.pm/membrane_element_mad/
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_element_mad, "~> 0.3"}
+{:membrane_mp3_mad_plugin, "~> 0.3"}
 ```
 
 You also need to have [MAD](https://www.underbit.com/products/mad/) installed.
@@ -26,13 +27,14 @@ Playing below pipeline should read `input.mp3`, decode and save raw payload to `
 defmodule MadExamplePipeline do
   use Membrane.Pipeline
   alias Pipeline.Spec
-  alias Membrane.Element.{Mad, File}
+  alias Membrane.MP3.MAD
+  alias Membrane.Element.File
 
   @impl true
   def handle_init(_) do
     children = [
       src: %File.Source{location: "input.mp3"},
-      decoder: Mad.Decoder,
+      decoder: MAD.Decoder,
       sink: %File.Sink{location: "output"},
     ]
     links = %{
