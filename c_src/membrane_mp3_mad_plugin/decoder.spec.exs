@@ -1,5 +1,7 @@
 module Membrane.MP3.MAD.Decoder.Native
 
+state_type "State"
+
 spec create() :: {:ok :: label, state}
 
 spec decode_frame(payload, state) ::

@@ -3,16 +3,18 @@ defmodule Membrane.MP3.MAD.BundlexProject do
 
   def project() do
     [
-      nifs: nifs(Bundlex.platform())
+      natives: natives()
     ]
   end
 
-  def nifs(_platform) do
+  def natives() do
     [
       decoder: [
-        deps: [membrane_common_c: :membrane, unifex: :unifex],
-        sources: ["_generated/decoder.c", "decoder.c"],
-        pkg_configs: ["mad"]
+        interface: :nif,
+        deps: [membrane_common_c: :membrane],
+        sources: ["decoder.c"],
+        pkg_configs: ["mad"],
+        preprocessor: Unifex
       ]
     ]
   end
