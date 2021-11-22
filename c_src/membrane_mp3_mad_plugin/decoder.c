@@ -72,7 +72,8 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* stat
   int channels = MAD_NCHANNELS(&(mad_frame->header));
   size_t decoded_frame_size = channels * mad_synth->pcm.length * BYTES_PER_SAMPLE;
 
-  UnifexPayload * out_payload = unifex_payload_alloc(env, in_payload->type, decoded_frame_size);
+  UnifexPayload* out_payload = (UnifexPayload *)unifex_alloc(sizeof(UnifexPayload));
+  unifex_payload_alloc(env, in_payload->type, decoded_frame_size, out_payload);
   unsigned char* data_ptr = out_payload->data;
 
 
@@ -91,7 +92,7 @@ UNIFEX_TERM decode_frame(UnifexEnv* env, UnifexPayload * in_payload, State* stat
   }
 
   result = decode_frame_result_ok(env, out_payload, bytes_used, mad_synth->pcm.samplerate, channels);
-  unifex_payload_release_ptr(&out_payload);
+  unifex_payload_release(out_payload);
   return result;
 }
 
