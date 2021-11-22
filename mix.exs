@@ -58,7 +58,7 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       {:membrane_caps_audio_mpeg, "~> 0.2.0"},
       {:membrane_caps_audio_raw, "~> 0.5.0"},
       {:membrane_common_c, "~> 0.10.0"},
-      {:unifex, "~> 0.6.0"},
+      {:unifex, "~> 0.7.0"},
       {:espec, "~> 1.7", only: :test}
     ]
   end
