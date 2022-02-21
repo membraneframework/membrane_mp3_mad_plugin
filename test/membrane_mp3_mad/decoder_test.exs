@@ -67,7 +67,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     length = 4
     buffer = %Buffer{payload: @minimal_mpeg_frame |> binary_part(0, length)}
 
-    assert {{:ok, _}, new_state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
+    assert {{:ok, []}, new_state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
 
     assert byte_size(new_state.queue) == length
     assert new_state.native == ctx.state.native
@@ -78,7 +78,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     state = %{ctx.state | queue: queue}
     buffer = %Buffer{payload: payload}
 
-    assert {{:ok, _}, new_state} = Decoder.handle_process(:input, buffer, ctx.context, state)
+    assert {{:ok, []}, new_state} = Decoder.handle_process(:input, buffer, ctx.context, state)
 
     assert byte_size(new_state.queue) == 4
     assert new_state.native == ctx.state.native

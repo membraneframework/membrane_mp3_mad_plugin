@@ -9,9 +9,9 @@ defmodule Membrane.MP3.MAD.Decoder do
   alias __MODULE__.Native
   alias Membrane.{Buffer, Logger}
 
-  def_input_pad :input, demand_unit: :buffers, caps: [:any, MPEG]
+  def_input_pad :input, demand_mode: :auto, caps: [:any, MPEG]
 
-  def_output_pad :output, caps: {Raw, format: :s24le}
+  def_output_pad :output, demand_mode: :auto, caps: {Raw, format: :s24le}
 
   @impl true
   def handle_init(_options) do
@@ -28,15 +28,6 @@ defmodule Membrane.MP3.MAD.Decoder do
   end
 
   @impl true
-  def handle_demand(:output, size, :buffers, _ctx, state) do
-    {{:ok, demand: {:input, size}}, state}
-  end
-
-  def handle_demand(:output, _size, :bytes, _ctx, state) do
-    {{:ok, demand: :input}, state}
-  end
-
-  @impl true
   def handle_caps(:input, _caps, _ctx, state) do
     {:ok, state}
   end
@@ -47,7 +38,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
     case decode_buffer(state.native, to_decode, ctx.pads.output.caps) do
       {:ok, {new_queue, actions}} ->
-        {{:ok, actions ++ [redemand: :output]}, %{state | queue: new_queue}}
+        {{:ok, actions}, %{state | queue: new_queue}}
 
       {:error, reason} ->
         {{:error, reason}, state}
