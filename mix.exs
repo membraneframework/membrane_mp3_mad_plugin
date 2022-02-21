@@ -1,7 +1,7 @@
 defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   use Mix.Project
 
-  @version "0.9.0"
+  @version "0.10.0"
   @github_url "https://github.com/membraneframework/membrane_mp3_mad_plugin"
 
   def project do
@@ -9,7 +9,7 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       app: :membrane_mp3_mad_plugin,
       compilers: [:unifex, :bundlex] ++ Mix.compilers(),
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       description: "Membrane MP3 decoder based on MAD",
       package: package(),
@@ -17,7 +17,6 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       source_url: @github_url,
       docs: docs(),
       homepage_url: "https://membraneframework.org",
-      preferred_cli_env: [espec: :test, format: :test],
       deps: deps()
     ]
   end
@@ -35,6 +34,7 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
     [
       main: "readme",
       extras: ["README.md", "LICENSE"],
+      formatters: ["html"],
       source_ref: "v#{@version}"
     ]
   end
@@ -42,7 +42,7 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   defp package do
     [
       maintainers: ["Membrane Team"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @github_url,
         "Membrane Framework Homepage" => "https://membraneframework.org"
@@ -53,13 +53,14 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.8.0"},
+      {:membrane_core, "~> 0.9.0"},
       {:membrane_caps_audio_mpeg, "~> 0.2.0"},
-      {:membrane_caps_audio_raw, "~> 0.5.0"},
-      {:membrane_common_c, "~> 0.10.0"},
+      {:membrane_caps_audio_raw, "~> 0.6.0"},
+      {:membrane_common_c, "~> 0.11.0"},
       {:unifex, "~> 0.7.0"},
-      {:espec, "~> 1.7", only: :test}
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:credo, "~> 1.6", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1", only: :dev, runtime: false}
     ]
   end
 end

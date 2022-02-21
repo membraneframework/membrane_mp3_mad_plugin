@@ -3,10 +3,11 @@ defmodule Membrane.MP3.MAD.Decoder do
   Decodes MPEG audio to raw data in S24LE format
   """
   use Membrane.Filter
+  require Membrane.Logger
+
   alias Membrane.Caps.Audio.{Raw, MPEG}
   alias __MODULE__.Native
-  alias Membrane.Buffer
-  use Membrane.Log
+  alias Membrane.{Buffer, Logger}
 
   def_input_pad :input, demand_unit: :buffers, caps: [:any, MPEG]
 
@@ -74,7 +75,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         {:ok, {buffer, Enum.reverse(acc)}}
 
       {:error, {:recoverable, bytes_to_skip}} ->
-        warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
+        Logger.warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
@@ -88,7 +89,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         end
 
       {:error, :malformed} ->
-        warn("Terminating stream because of malformed frame")
+        Logger.warn("Terminating stream because of malformed frame")
         {:error, :malformed}
     end
   end
