@@ -14,7 +14,7 @@ defmodule Membrane.MP3.MAD.Decoder do
   def_output_pad :output, caps: {Raw, format: :s24le}
 
   @impl true
-  def handle_init(_) do
+  def handle_init(_options) do
     {:ok, %{queue: <<>>, native: nil}}
   end
 
@@ -83,7 +83,7 @@ defmodule Membrane.MP3.MAD.Decoder do
             # send only one discontinuity event in a row
             decode_buffer(native, new_buffer, caps, acc)
 
-          _ ->
+          _no_event_on_top ->
             discontinuity = [event: {:output, %Membrane.Event.Discontinuity{}}]
             decode_buffer(native, new_buffer, caps, discontinuity ++ acc)
         end
