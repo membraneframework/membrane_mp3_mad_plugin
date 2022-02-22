@@ -3,17 +3,19 @@ defmodule Membrane.MP3.MAD.Decoder do
   Decodes MPEG audio to raw data in S24LE format
   """
   use Membrane.Filter
-  alias Membrane.Caps.Audio.{Raw, MPEG}
+  require Membrane.Logger
+
   alias __MODULE__.Native
-  alias Membrane.Buffer
-  use Membrane.Log
+  alias Membrane.{Buffer, Logger, RemoteStream}
+  alias Membrane.Caps.Audio.{MPEG, Raw}
+  alias Membrane.Event.Discontinuity
 
-  def_input_pad :input, demand_unit: :buffers, caps: [:any, MPEG]
+  def_input_pad :input, demand_mode: :auto, caps: [RemoteStream, MPEG]
 
-  def_output_pad :output, caps: {Raw, format: :s24le}
+  def_output_pad :output, demand_mode: :auto, caps: {Raw, format: :s24le}
 
   @impl true
-  def handle_init(_) do
+  def handle_init(_options) do
     {:ok, %{queue: <<>>, native: nil}}
   end
 
@@ -27,15 +29,6 @@ defmodule Membrane.MP3.MAD.Decoder do
   end
 
   @impl true
-  def handle_demand(:output, size, :buffers, _ctx, state) do
-    {{:ok, demand: {:input, size}}, state}
-  end
-
-  def handle_demand(:output, _size, :bytes, _ctx, state) do
-    {{:ok, demand: :input}, state}
-  end
-
-  @impl true
   def handle_caps(:input, _caps, _ctx, state) do
     {:ok, state}
   end
@@ -46,7 +39,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
     case decode_buffer(state.native, to_decode, ctx.pads.output.caps) do
       {:ok, {new_queue, actions}} ->
-        {{:ok, actions ++ [redemand: :output]}, %{state | queue: new_queue}}
+        {{:ok, actions}, %{state | queue: new_queue}}
 
       {:error, reason} ->
         {{:error, reason}, state}
@@ -74,21 +67,21 @@ defmodule Membrane.MP3.MAD.Decoder do
         {:ok, {buffer, Enum.reverse(acc)}}
 
       {:error, {:recoverable, bytes_to_skip}} ->
-        warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
+        Logger.warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
-          [{:event, _} | _] ->
+          [{:event, %Discontinuity{}} | _actions] ->
             # send only one discontinuity event in a row
             decode_buffer(native, new_buffer, caps, acc)
 
-          _ ->
-            discontinuity = [event: {:output, %Membrane.Event.Discontinuity{}}]
+          _no_event_on_top ->
+            discontinuity = [event: {:output, %Discontinuity{}}]
             decode_buffer(native, new_buffer, caps, discontinuity ++ acc)
         end
 
       {:error, :malformed} ->
-        warn("Terminating stream because of malformed frame")
+        Logger.warn("Terminating stream because of malformed frame")
         {:error, :malformed}
     end
   end
