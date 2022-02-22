@@ -5,11 +5,12 @@ defmodule Membrane.MP3.MAD.Decoder do
   use Membrane.Filter
   require Membrane.Logger
 
-  alias Membrane.Caps.Audio.{Raw, MPEG}
   alias __MODULE__.Native
-  alias Membrane.{Buffer, Logger}
+  alias Membrane.{Buffer, Logger, RemoteStream}
+  alias Membrane.Caps.Audio.{MPEG, Raw}
+  alias Membrane.Event.Discontinuity
 
-  def_input_pad :input, demand_mode: :auto, caps: [:any, MPEG]
+  def_input_pad :input, demand_mode: :auto, caps: [RemoteStream, MPEG]
 
   def_output_pad :output, demand_mode: :auto, caps: {Raw, format: :s24le}
 
@@ -70,12 +71,12 @@ defmodule Membrane.MP3.MAD.Decoder do
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
-          [{:event, _} | _] ->
+          [{:event, %Discontinuity{}} | _actions] ->
             # send only one discontinuity event in a row
             decode_buffer(native, new_buffer, caps, acc)
 
           _no_event_on_top ->
-            discontinuity = [event: {:output, %Membrane.Event.Discontinuity{}}]
+            discontinuity = [event: {:output, %Discontinuity{}}]
             decode_buffer(native, new_buffer, caps, discontinuity ++ acc)
         end
 
