@@ -2,7 +2,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
   use ExUnit.Case, async: true
 
   alias Membrane.Buffer
-  alias Membrane.Caps.Audio.Raw
+  alias Membrane.RawAudio
   alias Membrane.MP3.MAD.Decoder
   alias Membrane.MP3.MAD.Decoder.Native
 
@@ -37,10 +37,10 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     assert is_binary(payload)
     assert byte_size(payload) > 0
 
-    assert {:output, %Raw{} = caps} = actions[:caps]
+    assert {:output, %RawAudio{} = caps} = actions[:caps]
 
-    assert caps == %Raw{
-             format: :s24le,
+    assert caps == %RawAudio{
+             sample_format: :s24le,
              sample_rate: @minimal_sample_rate,
              channels: @minimal_frame_channels
            }
