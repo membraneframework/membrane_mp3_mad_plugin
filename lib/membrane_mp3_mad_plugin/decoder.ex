@@ -7,12 +7,13 @@ defmodule Membrane.MP3.MAD.Decoder do
 
   alias __MODULE__.Native
   alias Membrane.{Buffer, Logger, RemoteStream}
-  alias Membrane.Caps.Audio.{MPEG, Raw}
+  alias Membrane.Caps.Audio.MPEG
+  alias Membrane.RawAudio
   alias Membrane.Event.Discontinuity
 
   def_input_pad :input, demand_mode: :auto, caps: [RemoteStream, MPEG]
 
-  def_output_pad :output, demand_mode: :auto, caps: {Raw, format: :s24le}
+  def_output_pad :output, demand_mode: :auto, caps: {RawAudio, sample_format: :s24le}
 
   @impl true
   def handle_init(_options) do
@@ -55,7 +56,7 @@ defmodule Membrane.MP3.MAD.Decoder do
   defp decode_buffer(native, buffer, caps, acc) when byte_size(buffer) > 0 do
     with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
            Native.decode_frame(buffer, native) do
-      new_caps = %Raw{format: :s24le, sample_rate: sample_rate, channels: channels}
+      new_caps = %RawAudio{sample_format: :s24le, sample_rate: sample_rate, channels: channels}
 
       caps_action = if caps == new_caps, do: [], else: [caps: {:output, new_caps}]
       buffer_action = [buffer: {:output, %Buffer{payload: decoded_frame}}]
