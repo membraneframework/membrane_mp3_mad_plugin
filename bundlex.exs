@@ -3,11 +3,11 @@ defmodule Membrane.MP3.MAD.BundlexProject do
 
   def project() do
     [
-      natives: natives()
+      natives: natives(Bundlex.platform())
     ]
   end
 
-  def natives() do
+  def natives(_platform) do
     [
       decoder: [
         interface: :nif,

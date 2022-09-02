@@ -8,8 +8,8 @@ defmodule Membrane.MP3.MAD.Decoder do
   alias __MODULE__.Native
   alias Membrane.{Buffer, Logger, RemoteStream}
   alias Membrane.Caps.Audio.MPEG
-  alias Membrane.RawAudio
   alias Membrane.Event.Discontinuity
+  alias Membrane.RawAudio
 
   def_input_pad :input, demand_mode: :auto, caps: [RemoteStream, MPEG]
 
@@ -72,7 +72,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
-          [{:event, %Discontinuity{}} | _actions] ->
+          [{:event, {:output, %Discontinuity{}}} | _actions] ->
             # send only one discontinuity event in a row
             decode_buffer(native, new_buffer, caps, acc)
 
