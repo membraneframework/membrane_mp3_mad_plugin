@@ -17,29 +17,28 @@ defmodule Membrane.MP3.MAD.DecoderTest do
   @minimal_frame_channels 1
 
   setup do
-    context = %{pads: %{output: %{caps: nil}}}
+    context = %{pads: %{output: %{stream_format: nil}}}
     assert {:ok, native} = Native.create()
     state = %{native: native, queue: ""}
     [context: context, state: state]
   end
 
   test "handle_init", ctx do
-    assert {:ok, state} = Decoder.handle_init(%{})
+    assert {[], state} = Decoder.handle_init(%{}, %{})
     assert state.queue == ctx.state.queue
     assert state.native == nil
   end
 
   defp assert_sends_first_frame(state, context, incoming_buffer) do
-    assert {{:ok, actions}, new_state} =
-             Decoder.handle_process(:input, incoming_buffer, context, state)
+    assert {actions, new_state} = Decoder.handle_process(:input, incoming_buffer, context, state)
 
     assert {:output, %Buffer{payload: payload}} = actions[:buffer]
     assert is_binary(payload)
     assert byte_size(payload) > 0
 
-    assert {:output, %RawAudio{} = caps} = actions[:caps]
+    assert {:output, %RawAudio{} = stream_format} = actions[:stream_format]
 
-    assert caps == %RawAudio{
+    assert stream_format == %RawAudio{
              sample_format: :s24le,
              sample_rate: @minimal_sample_rate,
              channels: @minimal_frame_channels
@@ -67,7 +66,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     length = 4
     buffer = %Buffer{payload: @minimal_mpeg_frame |> binary_part(0, length)}
 
-    assert {{:ok, []}, new_state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
+    assert {[], new_state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
 
     assert byte_size(new_state.queue) == length
     assert new_state.native == ctx.state.native
@@ -78,7 +77,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     state = %{ctx.state | queue: queue}
     buffer = %Buffer{payload: payload}
 
-    assert {{:ok, []}, new_state} = Decoder.handle_process(:input, buffer, ctx.context, state)
+    assert {[], new_state} = Decoder.handle_process(:input, buffer, ctx.context, state)
 
     assert byte_size(new_state.queue) == 4
     assert new_state.native == ctx.state.native
