@@ -1,7 +1,7 @@
 defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   use Mix.Project
 
-  @version "0.14.0"
+  @version "0.14.1"
   @github_url "https://github.com/membraneframework/membrane_mp3_mad_plugin"
 
   def project do
