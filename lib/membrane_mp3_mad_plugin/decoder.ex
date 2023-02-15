@@ -6,10 +6,10 @@ defmodule Membrane.MP3.MAD.Decoder do
   require Membrane.Logger
 
   alias __MODULE__.Native
-  alias Membrane.{Buffer, Logger, RemoteStream}
-  alias Membrane.MPEGAudio
-  alias Membrane.RawAudio
+  alias Membrane.{Buffer, Logger, MPEGAudio, RawAudio, RemoteStream}
   alias Membrane.Event.Discontinuity
+
+  # ['Buffer', 'Event', 'Logger', 'MPEGAudio', 'RawAudio', 'RemoteStream']
 
   def_input_pad :input, demand_mode: :auto, accepted_format: any_of(RemoteStream, MPEGAudio)
 
@@ -79,15 +79,20 @@ defmodule Membrane.MP3.MAD.Decoder do
         Logger.warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
-        case acc do
-          [{:event, %Discontinuity{}} | _actions] ->
-            # send only one discontinuity event in a row
-            decode_buffer(native, new_buffer, stream_format, acc)
+        # TODO: first case cannot be reached because acc is always empty, recover these lines if it is needed
+        # case acc do
 
-          _no_event_on_top ->
-            discontinuity = [event: {:output, %Discontinuity{}}]
-            decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
-        end
+        #   [{:event, %Discontinuity{}} | _actions] ->
+        #     # send only one discontinuity event in a row
+        #     decode_buffer(native, new_buffer, stream_format, acc)
+
+        #   _no_event_on_top ->
+        #     discontinuity = [event: {:output, %Discontinuity{}}]
+        #     decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
+        # end
+
+        discontinuity = [event: {:output, %Discontinuity{}}]
+        decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
 
       {:error, :malformed} ->
         Logger.warn("Terminating stream because of malformed frame")
