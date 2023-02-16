@@ -9,7 +9,6 @@ defmodule Membrane.MP3.MAD.Decoder do
   alias Membrane.{Buffer, Logger, MPEGAudio, RawAudio, RemoteStream}
   alias Membrane.Event.Discontinuity
 
-
   def_input_pad :input, demand_mode: :auto, accepted_format: any_of(RemoteStream, MPEGAudio)
 
   def_output_pad :output, demand_mode: :auto, accepted_format: %RawAudio{sample_format: :s24le}
