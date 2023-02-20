@@ -77,20 +77,15 @@ defmodule Membrane.MP3.MAD.Decoder do
         Logger.warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
-        # TODO: first case cannot be reached because acc is always empty, recover these lines if it is needed
-        # case acc do
+        case acc do
+          [{:event, {:output, %Discontinuity{}}} | _actions] ->
+            # send only one discontinuity event in a row
+            decode_buffer(native, new_buffer, stream_format, acc)
 
-        #   [{:event, %Discontinuity{}} | _actions] ->
-        #     # send only one discontinuity event in a row
-        #     decode_buffer(native, new_buffer, stream_format, acc)
-
-        #   _no_event_on_top ->
-        #     discontinuity = [event: {:output, %Discontinuity{}}]
-        #     decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
-        # end
-
-        discontinuity = [event: {:output, %Discontinuity{}}]
-        decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
+          _no_event_on_top ->
+            discontinuity = [event: {:output, %Discontinuity{}}]
+            decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
+        end
 
       {:error, :malformed} ->
         Logger.warn("Terminating stream because of malformed frame")
