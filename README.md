@@ -14,35 +14,30 @@ Documentation is available at [HexDocs](https://hexdocs.pm/membrane_mp3_mad_plug
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-	{:membrane_mp3_mad_plugin, "~> 0.14.0"}
+	{:membrane_mp3_mad_plugin, "~> 0.14.1"}
 ```
 
 You also need to have [MAD](https://www.underbit.com/products/mad/) installed.
 
 ## Sample usage
 
-Playing below pipeline should read `input.mp3`, decode and save raw payload to `output`:
+Playing below pipeline should read `input.mp3` file, decode it and save a raw payload to the `output.raw` file:
 
 ```elixir
 defmodule MadExamplePipeline do
   use Membrane.Pipeline
-  alias Pipeline.Spec
+
   alias Membrane.MP3.MAD
-  alias Membrane.Element.File
+  alias Membrane.File
 
   @impl true
-  def handle_init(_) do
-    children = [
-      src: %File.Source{location: "input.mp3"},
-      decoder: MAD.Decoder,
-      sink: %File.Sink{location: "output"},
-    ]
-    links = %{
-      {:src, :source} => {:decoder, :sink},
-      {:decoder, :source} => {:sink, :sink}
-    }
+  def handle_init(_ctx, _opts) do
+    structure = 
+      child(:src, %File.Source{location: "input.mp3"})
+      |> child(:decoder, MAD.Decoder)
+      |> child(:sink, %File.Sink{location: "output.raw"})
 
-    {{:ok, %Spec{children: children, links: links}}, %{}}
+    {[spec: structure], %{}}
   end
 end
 

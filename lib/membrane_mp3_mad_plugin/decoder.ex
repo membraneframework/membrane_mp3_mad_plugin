@@ -6,9 +6,7 @@ defmodule Membrane.MP3.MAD.Decoder do
   require Membrane.Logger
 
   alias __MODULE__.Native
-  alias Membrane.{Buffer, Logger, RemoteStream}
-  alias Membrane.MPEGAudio
-  alias Membrane.RawAudio
+  alias Membrane.{Buffer, Logger, MPEGAudio, RawAudio, RemoteStream}
   alias Membrane.Event.Discontinuity
 
   def_input_pad :input, demand_mode: :auto, accepted_format: any_of(RemoteStream, MPEGAudio)
@@ -80,7 +78,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
-          [{:event, %Discontinuity{}} | _actions] ->
+          [{:event, {:output, %Discontinuity{}}} | _actions] ->
             # send only one discontinuity event in a row
             decode_buffer(native, new_buffer, stream_format, acc)
 
