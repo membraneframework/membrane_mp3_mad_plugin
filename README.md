@@ -14,7 +14,7 @@ Documentation is available at [HexDocs](https://hexdocs.pm/membrane_mp3_mad_plug
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-	{:membrane_mp3_mad_plugin, "~> 0.15.0"}
+	{:membrane_mp3_mad_plugin, "~> 0.16.0"}
 ```
 
 You also need to have [MAD](https://www.underbit.com/products/mad/) installed.
