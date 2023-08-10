@@ -15,7 +15,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
   @impl true
   def handle_init(_context, _options) do
-    {[], %{queue: <<>>, native: nil}}
+    {[], %{queue: <<>>, id3_skipped: false, native: nil}}
   end
 
   @impl true
@@ -33,6 +33,23 @@ defmodule Membrane.MP3.MAD.Decoder do
   end
 
   @impl true
+  def handle_process(:input, buffer, ctx, %{id3_skipped: false} = state) do
+    payload = state.queue <> buffer.payload
+
+    case skip_id3(payload) do
+      {:skipped, rest} ->
+        handle_process(:input, %Buffer{buffer | payload: rest}, ctx, %{
+          state
+          | id3_skipped: true,
+            queue: <<>>
+        })
+
+      :skipping ->
+        {[], %{state | queue: payload}}
+    end
+  end
+
+  @impl true
   def handle_process(:input, buffer, ctx, state) do
     to_decode = state.queue <> buffer.payload
 
@@ -42,6 +59,48 @@ defmodule Membrane.MP3.MAD.Decoder do
 
       {:error, reason} ->
         raise "Error: #{inspect(reason)}"
+    end
+  end
+
+  defp skip_id3(id3) do
+    import Bitwise
+
+    # taken from https://github.com/thechangelog/id3vx/blob/4e0349ea5bdb7f8bf8430b224151a7293fccb3fd/lib/id3vx.ex#L436
+    result =
+      case id3 do
+        <<"ID3", 2::integer, _minor::integer, _flags::size(8), tag_size::binary-size(4),
+          content::binary>> ->
+          {:tag, tag_size, content}
+
+        <<"ID3", 3::integer, _minor::integer, _flag_bytes::size(8), tag_size::binary-size(4),
+          content::binary>> ->
+          {:tag, tag_size, content}
+
+        <<"ID3", 4::integer, _minor::integer, _unsynchronisation::size(1),
+          _extended_header::size(1), _experimental::size(1), _footer::size(1), _unused::size(4),
+          tag_size::binary-size(4), content::binary>> ->
+          {:tag, tag_size, content}
+
+        payload when byte_size(payload) < 10 ->
+          :skipping
+
+        # no id3
+        payload ->
+          {:skipped, payload}
+      end
+
+    with {:tag, tag_size, content} <- result do
+      tag_size =
+        tag_size
+        |> :binary.bin_to_list()
+        |> Enum.reverse()
+        |> Enum.with_index()
+        |> Enum.reduce(0, fn {el, index}, acc -> acc ||| el <<< (index * 7) end)
+
+      case content do
+        <<_tag::binary-size(tag_size), rest::binary>> -> {:skipped, rest}
+        _content -> :skipping
+      end
     end
   end
 
