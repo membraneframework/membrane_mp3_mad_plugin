@@ -62,26 +62,25 @@ defmodule Membrane.MP3.MAD.Decoder do
     end
   end
 
-  defp skip_id3(id3) do
-    import Bitwise
-
+  defp skip_id3(payload) do
     # taken from https://github.com/thechangelog/id3vx/blob/4e0349ea5bdb7f8bf8430b224151a7293fccb3fd/lib/id3vx.ex#L436
     result =
-      case id3 do
-        <<"ID3", 2::integer, _minor::integer, _flags::size(8), tag_size::binary-size(4),
-          content::binary>> ->
+      case payload do
+        <<"ID3", version::integer, _minor::integer, _flags::size(8), tag_size::binary-size(4),
+          content::binary>>
+        when version in [2, 3] ->
           {:tag, tag_size, content}
 
-        <<"ID3", 3::integer, _minor::integer, _flag_bytes::size(8), tag_size::binary-size(4),
-          content::binary>> ->
-          {:tag, tag_size, content}
-
-        <<"ID3", 4::integer, _minor::integer, _unsynchronisation::size(1),
+        <<"ID3", version::integer, _minor::integer, _unsynchronisation::size(1),
           _extended_header::size(1), _experimental::size(1), _footer::size(1), _unused::size(4),
-          tag_size::binary-size(4), content::binary>> ->
+          tag_size::binary-size(4), content::binary>>
+        when version == 4 ->
           {:tag, tag_size, content}
 
-        payload when byte_size(payload) < 10 ->
+        <<"ID3", _rest::binary>> when byte_size(payload) < 10 ->
+          :skipping
+
+        payload when byte_size(payload) < 3 ->
           :skipping
 
         # no id3
@@ -90,18 +89,23 @@ defmodule Membrane.MP3.MAD.Decoder do
       end
 
     with {:tag, tag_size, content} <- result do
-      tag_size =
-        tag_size
-        |> :binary.bin_to_list()
-        |> Enum.reverse()
-        |> Enum.with_index()
-        |> Enum.reduce(0, fn {el, index}, acc -> acc ||| el <<< (index * 7) end)
+      tag_size = decode_synchsafe_integer(tag_size)
 
       case content do
         <<_tag::binary-size(tag_size), rest::binary>> -> {:skipped, rest}
         _content -> :skipping
       end
     end
+  end
+
+  defp decode_synchsafe_integer(binary) do
+    import Bitwise
+
+    binary
+    |> :binary.bin_to_list()
+    |> Enum.reverse()
+    |> Enum.with_index()
+    |> Enum.reduce(0, fn {el, index}, acc -> acc ||| el <<< (index * 7) end)
   end
 
   defp decode_buffer(native, buffer, stream_format, acc \\ [])
@@ -133,7 +137,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         {:ok, {buffer, Enum.reverse(acc)}}
 
       {:error, {:recoverable, bytes_to_skip}} ->
-        Logger.warn("Skipping malformed frame (#{bytes_to_skip} bytes)")
+        Logger.warning("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
         case acc do
@@ -147,7 +151,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         end
 
       {:error, :malformed} ->
-        Logger.warn("Terminating stream because of malformed frame")
+        Logger.warning("Terminating stream because of malformed frame")
         {:error, :malformed}
     end
   end

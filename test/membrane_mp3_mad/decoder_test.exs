@@ -58,8 +58,11 @@ defmodule Membrane.MP3.MAD.DecoderTest do
         0, 3, 76, 97, 118, 102, 53, 57, 46, 49, 54, 46, 49, 48, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0>>
 
-    assert {[], _state} =
-             Decoder.handle_process(:input, %Buffer{payload: id3}, ctx.context, ctx.state)
+    <<partial_frame::20-binary, _rest::binary>> = @minimal_mpeg_frame
+    buffer = %Buffer{payload: id3 <> partial_frame}
+
+    assert {[], state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
+    assert %{id3_skipped: true, queue: ^partial_frame} = state
   end
 
   test "handle_process with empty queue and whole frame in buffer", ctx do
