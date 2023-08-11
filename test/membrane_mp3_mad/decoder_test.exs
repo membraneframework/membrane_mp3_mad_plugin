@@ -19,7 +19,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
   setup do
     context = %{pads: %{output: %{stream_format: nil}}}
     assert {:ok, native} = Native.create()
-    state = %{native: native, queue: ""}
+    state = %{native: native, queue: <<>>, id3_skipped: false}
     [context: context, state: state]
   end
 
@@ -46,6 +46,23 @@ defmodule Membrane.MP3.MAD.DecoderTest do
 
     assert is_binary(payload)
     assert new_state.native == state.native
+  end
+
+  test "handle_process skips id3 tag", ctx do
+    id3 =
+      <<73, 68, 51, 4, 0, 0, 0, 0, 1, 0, 84, 88, 88, 88, 0, 0, 0, 18, 0, 0, 3, 109, 97, 106, 111,
+        114, 95, 98, 114, 97, 110, 100, 0, 109, 112, 52, 50, 0, 84, 88, 88, 88, 0, 0, 0, 17, 0, 0,
+        3, 109, 105, 110, 111, 114, 95, 118, 101, 114, 115, 105, 111, 110, 0, 48, 0, 84, 88, 88,
+        88, 0, 0, 0, 28, 0, 0, 3, 99, 111, 109, 112, 97, 116, 105, 98, 108, 101, 95, 98, 114, 97,
+        110, 100, 115, 0, 109, 112, 52, 50, 109, 112, 52, 49, 0, 84, 83, 83, 69, 0, 0, 0, 15, 0,
+        0, 3, 76, 97, 118, 102, 53, 57, 46, 49, 54, 46, 49, 48, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0>>
+
+    <<partial_frame::20-binary, _rest::binary>> = @minimal_mpeg_frame
+    buffer = %Buffer{payload: id3 <> partial_frame}
+
+    assert {[], state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
+    assert %{id3_skipped: true, queue: ^partial_frame} = state
   end
 
   test "handle_process with empty queue and whole frame in buffer", ctx do
