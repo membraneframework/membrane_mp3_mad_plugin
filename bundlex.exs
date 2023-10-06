@@ -32,7 +32,7 @@ defmodule Membrane.MP3.MAD.BundlexProject do
         interface: :nif,
         deps: [membrane_common_c: :membrane],
         sources: ["decoder.c"],
-        os_deps: [{get_mad_url(), "mad"}],
+        os_deps: [{[get_mad_url(), :pkg_config], "mad"}],
         preprocessor: Unifex
       ]
     ]
