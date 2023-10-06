@@ -8,16 +8,22 @@ defmodule Membrane.MP3.MAD.BundlexProject do
   end
 
   defp get_mad_url() do
-    system_architecture =
-      case Bundlex.get_target() do
-        %{os: "linux"} -> "linux"
-        %{architecture: "x86_64", os: "darwin" <> _rest_of_os_name} -> "macos_intel"
-        %{architecture: "aarch64", os: "darwin" <> _rest_of_os_name} -> "macos_m1"
-        _other -> nil
-      end
+    url_prefix =
+      "https://github.com/membraneframework-precompiled/precompiled_mad/releases/latest/download/mad"
 
-    {:precompiled,
-     "https://github.com/membraneframework-precompiled/precompiled_mad/releases/latest/download/mad_#{system_architecture}.tar.gz"}
+    case Bundlex.get_target() do
+      %{os: "linux"} ->
+        {:precompiled, "#{url_prefix}_linux.tar.gz"}
+
+      %{architecture: "x86_64", os: "darwin" <> _rest_of_os_name} ->
+        {:precompiled, "#{url_prefix}_macos_intel.tar.gz"}
+
+      %{architecture: "aarch64", os: "darwin" <> _rest_of_os_name} ->
+        {:precompiled, "#{url_prefix}_macos_arm.tar.gz"}
+
+      _other ->
+        nil
+    end
   end
 
   def natives() do

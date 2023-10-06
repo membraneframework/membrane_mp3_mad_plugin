@@ -17,7 +17,8 @@ Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 	{:membrane_mp3_mad_plugin, "~> 0.16.1"}
 ```
 
-You also need to have [MAD](https://www.underbit.com/products/mad/) installed.
+This package depends on the [MAD](https://www.underbit.com/products/mad/) library. The precompiled 
+build will be pulled and linked automatically. However, should there be any problems, consider installing it manually.
 
 ## Sample usage
 

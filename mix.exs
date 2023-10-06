@@ -54,11 +54,11 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   defp deps do
     [
       {:membrane_core, "~> 0.12.0"},
-      {:membrane_mpegaudio_format, "~> 0.3"},
+      {:membrane_mpegaudio_format, "~> 0.3.0"},
       {:membrane_raw_audio_format, "~> 0.11.0"},
       {:membrane_common_c, "~> 0.15.0"},
-      {:unifex, "~> 1.0"},
-      {:bundlex, github: "membraneframework/bundlex", branch: "precompiled_deps", override: true},
+      {:unifex, "~> 1.1.0"},
+      {:bundlex, "~> 1.2.0"},
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: :dev, runtime: false}
