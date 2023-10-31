@@ -19,7 +19,7 @@ defmodule Membrane.MP3.MAD.BundlexProject do
         {:precompiled, "#{url_prefix}_macos_intel.tar.gz"}
 
       %{architecture: "aarch64", os: "darwin" <> _rest_of_os_name} ->
-          {:precompiled, "#{url_prefix}_macos_arm.tar.gz"}
+        {:precompiled, "#{url_prefix}_macos_arm.tar.gz"}
 
       _other ->
         nil
