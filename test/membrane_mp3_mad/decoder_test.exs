@@ -30,7 +30,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
   end
 
   defp assert_sends_first_frame(state, context, incoming_buffer) do
-    assert {actions, new_state} = Decoder.handle_process(:input, incoming_buffer, context, state)
+    assert {actions, new_state} = Decoder.handle_buffer(:input, incoming_buffer, context, state)
 
     assert {:output, %Buffer{payload: payload}} = actions[:buffer]
     assert is_binary(payload)
@@ -48,7 +48,7 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     assert new_state.native == state.native
   end
 
-  test "handle_process skips id3 tag", ctx do
+  test "handle_buffer skips id3 tag", ctx do
     id3 =
       <<73, 68, 51, 4, 0, 0, 0, 0, 1, 0, 84, 88, 88, 88, 0, 0, 0, 18, 0, 0, 3, 109, 97, 106, 111,
         114, 95, 98, 114, 97, 110, 100, 0, 109, 112, 52, 50, 0, 84, 88, 88, 88, 0, 0, 0, 17, 0, 0,
@@ -61,17 +61,17 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     <<partial_frame::20-binary, _rest::binary>> = @minimal_mpeg_frame
     buffer = %Buffer{payload: id3 <> partial_frame}
 
-    assert {[], state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
+    assert {[], state} = Decoder.handle_buffer(:input, buffer, ctx.context, ctx.state)
     assert %{id3_skipped: true, queue: ^partial_frame} = state
   end
 
-  test "handle_process with empty queue and whole frame in buffer", ctx do
+  test "handle_buffer with empty queue and whole frame in buffer", ctx do
     buffer = %Buffer{payload: @minimal_mpeg_frame}
 
     assert_sends_first_frame(ctx.state, ctx.context, buffer)
   end
 
-  test "handle_process with buffer completing frame in queue", ctx do
+  test "handle_buffer with buffer completing frame in queue", ctx do
     <<queue::20-bytes, rest::bytes>> = @minimal_mpeg_frame
     state = %{ctx.state | queue: queue}
     buffer = %Buffer{payload: rest}
@@ -79,22 +79,22 @@ defmodule Membrane.MP3.MAD.DecoderTest do
     assert_sends_first_frame(state, ctx.context, buffer)
   end
 
-  test "handle_process with partial frame in buffer", ctx do
+  test "handle_buffer with partial frame in buffer", ctx do
     length = 4
     buffer = %Buffer{payload: @minimal_mpeg_frame |> binary_part(0, length)}
 
-    assert {[], new_state} = Decoder.handle_process(:input, buffer, ctx.context, ctx.state)
+    assert {[], new_state} = Decoder.handle_buffer(:input, buffer, ctx.context, ctx.state)
 
     assert byte_size(new_state.queue) == length
     assert new_state.native == ctx.state.native
   end
 
-  test "handle_process with partial frame in buffer and queue", ctx do
+  test "handle_buffer with partial frame in buffer and queue", ctx do
     <<queue::2-bytes, payload::2-bytes, _rest::bytes>> = @minimal_mpeg_frame
     state = %{ctx.state | queue: queue}
     buffer = %Buffer{payload: payload}
 
-    assert {[], new_state} = Decoder.handle_process(:input, buffer, ctx.context, state)
+    assert {[], new_state} = Decoder.handle_buffer(:input, buffer, ctx.context, state)
 
     assert byte_size(new_state.queue) == 4
     assert new_state.native == ctx.state.native

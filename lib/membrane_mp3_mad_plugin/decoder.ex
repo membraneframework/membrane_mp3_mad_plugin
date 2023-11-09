@@ -9,9 +9,9 @@ defmodule Membrane.MP3.MAD.Decoder do
   alias Membrane.{Buffer, Logger, MPEGAudio, RawAudio, RemoteStream}
   alias Membrane.Event.Discontinuity
 
-  def_input_pad :input, demand_mode: :auto, accepted_format: any_of(RemoteStream, MPEGAudio)
+  def_input_pad :input,  accepted_format: any_of(RemoteStream, MPEGAudio)
 
-  def_output_pad :output, demand_mode: :auto, accepted_format: %RawAudio{sample_format: :s24le}
+  def_output_pad :output, accepted_format: %RawAudio{sample_format: :s24le}
 
   @impl true
   def handle_init(_context, _options) do
@@ -33,12 +33,12 @@ defmodule Membrane.MP3.MAD.Decoder do
   end
 
   @impl true
-  def handle_process(:input, buffer, ctx, %{id3_skipped: false} = state) do
+  def handle_buffer(:input, buffer, ctx, %{id3_skipped: false} = state) do
     payload = state.queue <> buffer.payload
 
     case skip_id3(payload) do
       {:skipped, rest} ->
-        handle_process(:input, %Buffer{buffer | payload: rest}, ctx, %{
+        handle_buffer(:input, %Buffer{buffer | payload: rest}, ctx, %{
           state
           | id3_skipped: true,
             queue: <<>>
@@ -50,7 +50,7 @@ defmodule Membrane.MP3.MAD.Decoder do
   end
 
   @impl true
-  def handle_process(:input, buffer, ctx, state) do
+  def handle_buffer(:input, buffer, ctx, state) do
     to_decode = state.queue <> buffer.payload
 
     case decode_buffer(state.native, to_decode, ctx.pads.output.stream_format) do
