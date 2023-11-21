@@ -13,7 +13,7 @@ defmodule Membrane.MP3.MAD.BundlexProject do
 
     case Bundlex.get_target() do
       %{os: "linux"} ->
-        "#{url_prefix}_linux.tar.gz"}
+        "#{url_prefix}_linux.tar.gz"
 
       %{architecture: "x86_64", os: "darwin" <> _rest_of_os_name} ->
        "#{url_prefix}_macos_intel.tar.gz"
