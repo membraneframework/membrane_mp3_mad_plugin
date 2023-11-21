@@ -16,10 +16,10 @@ defmodule Membrane.MP3.MAD.BundlexProject do
         "#{url_prefix}_linux.tar.gz"}
 
       %{architecture: "x86_64", os: "darwin" <> _rest_of_os_name} ->
-       "#{url_prefix}_macos_intel.tar.gz"}
+       "#{url_prefix}_macos_intel.tar.gz"
 
       %{architecture: "aarch64", os: "darwin" <> _rest_of_os_name} ->
-       	"#{url_prefix}_macos_arm.tar.gz"}
+       	"#{url_prefix}_macos_arm.tar.gz"
 
       _other ->
         nil
