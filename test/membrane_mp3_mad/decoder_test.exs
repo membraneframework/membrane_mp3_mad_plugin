@@ -5,11 +5,11 @@ defmodule Membrane.MP3.MAD.DecoderTest do
   import Membrane.Testing.Assertions
 
   alias Membrane.{Buffer, RawAudio}
+  alias Membrane.File.Source
   alias Membrane.MP3.MAD.Decoder
   alias Membrane.MP3.MAD.Decoder.Native
-  alias Membrane.Testing.Pipeline
-  alias Membrane.File.Source
   alias Membrane.PortAudio.Sink
+  alias Membrane.Testing.Pipeline
 
   @minimal_mpeg_frame <<255, 243, 20, 196, 0, 0, 0, 3, 72, 0, 0, 0, 0, 76, 65, 77, 69, 51, 46, 57,
                         54, 46, 49, 85, 255, 243, 20, 196, 11, 255, 243, 20, 196, 11, 0, 0, 3, 72,
