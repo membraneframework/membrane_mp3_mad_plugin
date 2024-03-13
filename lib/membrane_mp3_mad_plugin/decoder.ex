@@ -53,7 +53,7 @@ defmodule Membrane.MP3.MAD.Decoder do
   def handle_buffer(:input, buffer, ctx, state) do
     to_decode = state.queue <> buffer.payload
 
-    case decode_buffer(state.native, to_decode, ctx.pads.output.stream_format) do
+    case decode_buffer(state.native, to_decode, buffer.pts, ctx.pads.output.stream_format) do
       {:ok, {new_queue, actions}} ->
         {actions, %{state | queue: new_queue}}
 
@@ -108,13 +108,13 @@ defmodule Membrane.MP3.MAD.Decoder do
     |> Enum.reduce(0, fn {el, index}, acc -> acc ||| el <<< (index * 7) end)
   end
 
-  defp decode_buffer(native, buffer, stream_format, acc \\ [])
+  defp decode_buffer(native, buffer, pts, stream_format, acc \\ [])
 
-  defp decode_buffer(_native, <<>>, _stream_format, acc) do
+  defp decode_buffer(_native, <<>>, _pts, _stream_format, acc) do
     {:ok, {<<>>, Enum.reverse(acc)}}
   end
 
-  defp decode_buffer(native, buffer, stream_format, acc) when byte_size(buffer) > 0 do
+  defp decode_buffer(native, buffer, pts, stream_format, acc) when byte_size(buffer) > 0 do
     with {:ok, {decoded_frame, frame_size, sample_rate, channels}} <-
            Native.decode_frame(buffer, native) do
       new_stream_format = %RawAudio{
@@ -128,10 +128,18 @@ defmodule Membrane.MP3.MAD.Decoder do
           do: [],
           else: [stream_format: {:output, new_stream_format}]
 
-      buffer_action = [buffer: {:output, %Buffer{payload: decoded_frame}}]
+      buffer_action = [buffer: {:output, %Buffer{payload: decoded_frame, pts: pts}}]
 
       <<_used::binary-size(frame_size), rest::binary>> = buffer
-      decode_buffer(native, rest, new_stream_format, buffer_action ++ stream_format_action ++ acc)
+      next_pts = if pts == nil, do: nil, else: pts + trunc(Membrane.Time.second() / sample_rate)
+
+      decode_buffer(
+        native,
+        rest,
+        next_pts,
+        new_stream_format,
+        buffer_action ++ stream_format_action ++ acc
+      )
     else
       {:error, :buflen} ->
         {:ok, {buffer, Enum.reverse(acc)}}
@@ -140,14 +148,19 @@ defmodule Membrane.MP3.MAD.Decoder do
         Logger.warning("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
+        next_pts =
+          if pts == nil,
+            do: nil,
+            else: pts + trunc(Membrane.Time.second() / stream_format.sample_rate)
+
         case acc do
           [{:event, {:output, %Discontinuity{}}} | _actions] ->
             # send only one discontinuity event in a row
-            decode_buffer(native, new_buffer, stream_format, acc)
+            decode_buffer(native, new_buffer, next_pts, stream_format, acc)
 
           _no_event_on_top ->
             discontinuity = [event: {:output, %Discontinuity{}}]
-            decode_buffer(native, new_buffer, stream_format, discontinuity ++ acc)
+            decode_buffer(native, new_buffer, next_pts, stream_format, discontinuity ++ acc)
         end
 
       {:error, :malformed} ->
