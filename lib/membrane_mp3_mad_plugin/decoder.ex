@@ -9,6 +9,8 @@ defmodule Membrane.MP3.MAD.Decoder do
   alias Membrane.{Buffer, Logger, MPEGAudio, RawAudio, RemoteStream}
   alias Membrane.Event.Discontinuity
 
+  @samples_per_frame 1152
+
   def_input_pad :input, accepted_format: any_of(RemoteStream, MPEGAudio)
 
   def_output_pad :output, accepted_format: %RawAudio{sample_format: :s24le}
@@ -131,7 +133,11 @@ defmodule Membrane.MP3.MAD.Decoder do
       buffer_action = [buffer: {:output, %Buffer{payload: decoded_frame, pts: pts}}]
 
       <<_used::binary-size(frame_size), rest::binary>> = buffer
-      next_pts = if pts == nil, do: nil, else: pts + trunc(Membrane.Time.second() / sample_rate)
+
+      next_pts =
+        if pts == nil,
+          do: nil,
+          else: pts + RawAudio.frames_to_time(@samples_per_frame, new_stream_format)
 
       decode_buffer(
         native,
@@ -151,7 +157,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         next_pts =
           if pts == nil,
             do: nil,
-            else: pts + trunc(Membrane.Time.second() / stream_format.sample_rate)
+            else: pts + RawAudio.frames_to_time(@samples_per_frame, stream_format)
 
         case acc do
           [{:event, {:output, %Discontinuity{}}} | _actions] ->
