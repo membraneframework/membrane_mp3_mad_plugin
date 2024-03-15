@@ -64,7 +64,6 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: :dev, runtime: false},
       # testing deps
-      {:membrane_portaudio_plugin, "~> 0.18.0", only: :test},
       {:membrane_file_plugin, "~> 0.17.0", only: :test}
     ]
   end
