@@ -1,10 +1,14 @@
 defmodule Membrane.MP3.MAD.DecoderTest do
   use ExUnit.Case, async: true
 
-  alias Membrane.Buffer
+  import Membrane.ChildrenSpec
+  import Membrane.Testing.Assertions
+
+  alias Membrane.{Buffer, RawAudio}
+  alias Membrane.File.{Sink, Source}
   alias Membrane.MP3.MAD.Decoder
   alias Membrane.MP3.MAD.Decoder.Native
-  alias Membrane.RawAudio
+  alias Membrane.Testing.Pipeline
 
   @minimal_mpeg_frame <<255, 243, 20, 196, 0, 0, 0, 3, 72, 0, 0, 0, 0, 76, 65, 77, 69, 51, 46, 57,
                         54, 46, 49, 85, 255, 243, 20, 196, 11, 255, 243, 20, 196, 11, 0, 0, 3, 72,
@@ -15,6 +19,9 @@ defmodule Membrane.MP3.MAD.DecoderTest do
 
   @minimal_sample_rate 24_000
   @minimal_frame_channels 1
+
+  @in_path "test/fixtures/input.mp3"
+  @ref_path "test/fixtures/output.raw"
 
   setup do
     context = %{pads: %{output: %{stream_format: nil}}}
@@ -98,5 +105,22 @@ defmodule Membrane.MP3.MAD.DecoderTest do
 
     assert byte_size(new_state.queue) == 4
     assert new_state.native == ctx.state.native
+  end
+
+  @tag :tmp_dir
+  test "Decoder decodes fixture correctly", ctx do
+    out_path = Path.join(ctx.tmp_dir, "output.raw")
+
+    pipeline =
+      Pipeline.start_link_supervised!(
+        spec:
+          child(:source, %Source{location: @in_path})
+          |> child(:decoder, Decoder)
+          |> child(:sink, %Sink{location: out_path})
+      )
+
+    assert_end_of_stream(pipeline, :sink)
+    Pipeline.terminate(pipeline)
+    assert File.read(out_path) == File.read(@ref_path)
   end
 end
