@@ -134,10 +134,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
       <<_used::binary-size(frame_size), rest::binary>> = buffer
 
-      next_pts =
-        if pts == nil,
-          do: nil,
-          else: pts + RawAudio.frames_to_time(@samples_per_frame, new_stream_format)
+      next_pts = get_next_timestamp(pts, new_stream_format)
 
       decode_buffer(
         native,
@@ -154,10 +151,7 @@ defmodule Membrane.MP3.MAD.Decoder do
         Logger.warning("Skipping malformed frame (#{bytes_to_skip} bytes)")
         <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
 
-        next_pts =
-          if pts == nil,
-            do: nil,
-            else: pts + RawAudio.frames_to_time(@samples_per_frame, stream_format)
+        next_pts = get_next_timestamp(pts, stream_format)
 
         case acc do
           [{:event, {:output, %Discontinuity{}}} | _actions] ->
@@ -173,5 +167,13 @@ defmodule Membrane.MP3.MAD.Decoder do
         Logger.warning("Terminating stream because of malformed frame")
         {:error, :malformed}
     end
+  end
+
+  @spec get_next_timestamp(timestamp :: Membrane.Time.t() | nil, stream_format :: RawAudio.t()) ::
+          Membrane.Time.t() | nil
+  defp get_next_timestamp(timestamp, stream_format) do
+    if timestamp == nil,
+      do: nil,
+      else: timestamp + RawAudio.frames_to_time(@samples_per_frame, stream_format)
   end
 end
