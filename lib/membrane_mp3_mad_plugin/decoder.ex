@@ -171,8 +171,11 @@ defmodule Membrane.MP3.MAD.Decoder do
 
   @spec get_next_timestamp(timestamp :: Membrane.Time.t() | nil, stream_format :: RawAudio.t()) ::
           Membrane.Time.t() | nil
-  defp get_next_timestamp(nil, stream_format), do: nil
-  
-  defp get_next_timestamp(timestamp, stream_format), do:
+  defp get_next_timestamp(nil, _stream_format) do
+    nil
+  end
+
+  defp get_next_timestamp(timestamp, stream_format) do
     timestamp + RawAudio.frames_to_time(@samples_per_frame, stream_format)
+  end
 end
