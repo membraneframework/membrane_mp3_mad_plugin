@@ -1,7 +1,7 @@
 defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   use Mix.Project
 
-  @version "0.18.4"
+  @version "0.18.5"
   @github_url "https://github.com/membraneframework/membrane_mp3_mad_plugin"
 
   def project do
@@ -59,7 +59,7 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       {:membrane_common_c, "~> 0.16.0"},
       {:unifex, "~> 1.1"},
       {:bundlex, "~> 1.3"},
-      {:membrane_precompiled_dependency_provider, "~> 0.1.0"},
+      {:membrane_precompiled_dependency_provider, "~> 0.2.1"},
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: :dev, runtime: false},
