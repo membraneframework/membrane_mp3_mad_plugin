@@ -15,7 +15,8 @@ defmodule Membrane.MP3.MAD.BundlexProject do
         sources: ["decoder.c"],
         os_deps: [
           mad: [
-            {:precompiled, Membrane.PrecompiledDependencyProvider.get_dependency_url(:mad)},
+            {:precompiled,
+             Membrane.PrecompiledDependencyProvider.get_dependency_url(:mad, version: "0.15.1b")},
             :pkg_config
           ]
         ],
