@@ -40,7 +40,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
     case skip_id3(payload) do
       {:skipped, rest} ->
-        handle_buffer(:input, %Buffer{buffer | payload: rest}, ctx, %{
+        handle_buffer(:input, %{buffer | payload: rest}, ctx, %{
           state
           | id3_skipped: true,
             queue: <<>>

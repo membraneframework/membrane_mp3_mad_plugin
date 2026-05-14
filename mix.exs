@@ -1,7 +1,7 @@
 defmodule Membrane.MP3.MAD.Plugin.Mixfile do
   use Mix.Project
 
-  @version "0.18.5"
+  @version "0.18.6"
   @github_url "https://github.com/membraneframework/membrane_mp3_mad_plugin"
 
   def project do
@@ -17,7 +17,8 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       source_url: @github_url,
       docs: docs(),
       homepage_url: "https://membraneframework.org",
-      deps: deps()
+      deps: deps(),
+      dialyzer: dialyzer()
     ]
   end
 
@@ -51,6 +52,20 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
     ]
   end
 
+  defp dialyzer() do
+    opts = [
+      flags: [:error_handling]
+    ]
+
+    if System.get_env("CI") == "true" do
+      # Store PLTs in cacheable directory for CI
+      File.mkdir_p!(Path.join([__DIR__, "priv", "plts"]))
+      [plt_local_path: "priv/plts", plt_core_path: "priv/plts"] ++ opts
+    else
+      opts
+    end
+  end
+
   defp deps do
     [
       {:membrane_core, "~> 1.0"},
@@ -60,9 +75,9 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       {:unifex, "~> 1.1"},
       {:bundlex, "~> 1.3"},
       {:membrane_precompiled_dependency_provider, "~> 0.2.1"},
-      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
-      {:credo, "~> 1.6", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.1", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:credo, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       # testing deps
       {:membrane_file_plugin, "~> 0.17.0", only: :test}
     ]
