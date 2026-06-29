@@ -75,7 +75,7 @@ defmodule Membrane.MP3.MAD.Plugin.Mixfile do
       {:unifex, "~> 1.1"},
       {:bundlex, "~> 1.3"},
       {:membrane_precompiled_dependency_provider, "~> 0.2.1"},
-      {:ex_doc, "~> 0.40", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.40.0", only: :dev, runtime: false},
       {:credo, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       # testing deps
