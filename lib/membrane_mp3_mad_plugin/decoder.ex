@@ -94,7 +94,7 @@ defmodule Membrane.MP3.MAD.Decoder do
       tag_size = decode_synchsafe_integer(tag_size)
 
       case content do
-        <<_tag::binary-size(tag_size), rest::binary>> -> {:skipped, rest}
+        <<_tag::binary-size(^tag_size), rest::binary>> -> {:skipped, rest}
         _content -> :skipping
       end
     end
@@ -132,7 +132,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
       buffer_action = [buffer: {:output, %Buffer{payload: decoded_frame, pts: pts}}]
 
-      <<_used::binary-size(frame_size), rest::binary>> = buffer
+      <<_used::binary-size(^frame_size), rest::binary>> = buffer
 
       next_pts = get_next_timestamp(pts, new_stream_format)
 
@@ -149,7 +149,7 @@ defmodule Membrane.MP3.MAD.Decoder do
 
       {:error, {:recoverable, bytes_to_skip}} ->
         Logger.warning("Skipping malformed frame (#{bytes_to_skip} bytes)")
-        <<_used::binary-size(bytes_to_skip), new_buffer::binary>> = buffer
+        <<_used::binary-size(^bytes_to_skip), new_buffer::binary>> = buffer
 
         next_pts = get_next_timestamp(pts, stream_format)
 
