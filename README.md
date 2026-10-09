@@ -1,6 +1,7 @@
 # Membrane MP3 MAD plugin
 
-[![CircleCI](https://circleci.com/gh/membraneframework/membrane_mp3_mad_plugin.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane_mp3_mad_plugin)
+[![Star Membrane on GitHub ★](https://img.shields.io/github/stars/membraneframework/membrane_core?style=flat&logo=github&label=Star%20Membrane%20on%20GitHub%20%E2%98%85&color=blue)](https://github.com/membraneframework/membrane_core)
+[![CI](https://github.com/membraneframework/membrane_mp3_mad_plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/membraneframework/membrane_mp3_mad_plugin/actions/workflows/ci.yml)
 
 MP3 decoder based on MAD.
 
